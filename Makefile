@@ -1,8 +1,5 @@
-PROG= iwatch
-CFLAGS+= -g -Wall
-LDADD+=	-lcurses -ltermcap
-DPADD+=	${LIBCURSES} ${LIBTERMCAP}
-
-MKMAN=	no
+PROG=		iwatch
+LDADD+=		-lcurses -ltermcap
+DPADD+=		${LIBCURSES} ${LIBTERMCAP}
 
 .include <bsd.prog.mk>
