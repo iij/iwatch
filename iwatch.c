@@ -184,8 +184,8 @@ int main(argc, argv)
 	}
 
 	if (*execute)
-	    strncat(execute, " ",   sizeof(execute) - 1);
-	strncat(execute, *argv, sizeof(execute) - 1);
+	    strlcat(execute, " ", sizeof(execute));
+	strlcat(execute, *argv, sizeof(execute));
 	argv++;
 	argc--;
     }
