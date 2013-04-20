@@ -104,25 +104,22 @@ kbd_result_t  kbd_command (int);
 void          showhelp (void);
 void          untabify (char *, int);
 void          die (int);
-void          usage (char *, const char *);
+void          usage (void);
 
 int
 main(int argc, char *argv[])
 {
     int ch;
-    char *myname = argv[0];
-    const char *optstr;
 
     /*
      * Command line option handling
      */
-    optstr = "i:rewps:c:d";
-    while ((ch = getopt(argc, argv, optstr)) != -1)
+    while ((ch = getopt(argc, argv, "i:rewps:c:d")) != -1)
 	switch (ch) {
 	case 'i':
 	    opt_interval = atoi(optarg);
 	    if (opt_interval == 0 || argc < 3) {
-		usage(myname, optstr);
+		usage();
 		exit(1);
 	    }
 	    break;
@@ -148,23 +145,17 @@ main(int argc, char *argv[])
 	    opt_debug = 1;
 	    break;
 	default:
-	    usage(myname, optstr);
+	    usage();
 	    exit(1);
 	}
     argc -= optind;
     argv += optind;
 
-    if (myname) {
-	char *cp = rindex(myname, '/');
-	if (cp)
-	    myname = cp + 1;
-    }
-
     /*
      * Build command string to give to popen
      */
-    if (!*argv) {
-	usage(myname, optstr);
+    if (argc <= 0) {
+	usage();
 	exit(1);
     }
     (void) bzero(execute, sizeof(execute));
@@ -685,16 +676,12 @@ die(int notused)
 }
 
 void
-usage(char *name, const char *optstr)
+usage(void)
 {
-    fprintf(stderr, "Usage: %s ", name);
-    while (*optstr) {
-	fprintf(stderr, "[-%c", *optstr++);
-	if (*optstr == ':') {
-	    fprintf(stderr, " #");
-	    optstr++;
-	}
-	fprintf(stderr, "] ");
-    }
-    fprintf(stderr, "command [args]\n");
+    extern char *__progname;
+
+    fprintf(stderr,
+	"usage: %s [-rewpd] [-i internval] [-s start_line] [-c start_column]\n"
+	"       %*s command [arg ...]\n",
+	__progname, (int)strlen(__progname), " ");
 }
