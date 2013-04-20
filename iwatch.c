@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000,2001 Internet Initiative Japan Inc.
+ * Copyright (c) 2000, 2001 Internet Initiative Japan Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,17 +46,16 @@
  *
  */
 
+#include <sys/param.h>
+
+#include <ctype.h>
 #include <curses.h>
+#include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <signal.h>
 #include <unistd.h>
-
-#include <sys/time.h>
-#include <sys/errno.h>
-#include <errno.h>
 
 #define DEFAULT_INTERVAL 2
 #define MAXLINE 300
@@ -107,9 +106,8 @@ void          untabify (char *, int);
 void          die (int);
 void          usage (char *, const char *);
 
-int main(argc, argv)
-    int  argc;
-    char *argv[];
+int
+main(int argc, char *argv[])
 {
     int ch;
     char *myname = argv[0];
@@ -206,7 +204,8 @@ int main(argc, argv)
     return 0;
 }
 
-void command_loop()
+void
+command_loop(void)
 {
     int nfds;
     BUFFER buf0, buf1;
@@ -235,7 +234,7 @@ void command_loop()
 	to.tv_usec = 0;
 	FD_ZERO(&readfds);
 	FD_SET(fileno(stdin), &readfds);
-   	nfds = select(1, &readfds, NULL, NULL, pause_status ? NULL : &to);
+	nfds = select(1, &readfds, NULL, NULL, pause_status ? NULL : &to);
 	if (nfds < 0)
 	    switch (errno) {
 	    case EINTR:
@@ -263,9 +262,8 @@ void command_loop()
     } while (1);
 }
 
-int display(cur, prev, reverse)
-    BUFFER *cur, *prev;
-    reverse_mode_t reverse;
+int
+display(BUFFER *cur, BUFFER *prev, reverse_mode_t reverse)
 {
     int screen_x, screen_y;
     int line /* , column */;
@@ -390,8 +388,8 @@ int display(cur, prev, reverse)
     return 1;
 }
 
-void read_result(buf)
-    BUFFER *buf;
+void
+read_result(BUFFER *buf)
 {
     FILE *fp;
     int i = 0;
@@ -407,7 +405,7 @@ void read_result(buf)
     if ((fp = popen(execute, "r")) == (FILE *)NULL) {
 	perror("popen");
 	exit(2);
-    } 
+    }
 
     /*
      * Read command output and convert tab to spaces
@@ -430,8 +428,9 @@ void read_result(buf)
     time(&lastupdate);
 }
 
-kbd_result_t kbd_command(ch)
-    int ch;		/* command character */
+/* ch: command character */
+kbd_result_t
+kbd_command(int ch)
 {
     switch (ch) {
 
@@ -532,7 +531,7 @@ kbd_result_t kbd_command(ch)
     case 'g':
 	if (prefix < MAXLINE)
 	    start_line = prefix;
- 	prefix = 0;
+	prefix = 0;
 	break;
 
 	/*
@@ -609,7 +608,8 @@ const char *helpmsg[] = {
     (char*) 0,
 };
 
-void showhelp()
+void
+showhelp(void)
 {
     size_t length = 0;
     int lines;
@@ -653,9 +653,8 @@ void showhelp()
     delwin(helpwin);
 }
 
-void untabify(buf, maxlen)
-    char *buf;
-    int maxlen;
+void
+untabify(char *buf, int maxlen)
 {
     int tabstop = 8;
     char *p = buf;
@@ -676,17 +675,17 @@ void untabify(buf, maxlen)
     }
 }
 
-void die(int notused)
+void
+die(int notused)
 {
-    erase(); 
-    refresh(); 
+    erase();
+    refresh();
     endwin();
     exit(0);
-} 
+}
 
-void usage(name, optstr)
-    char *name;
-    const char *optstr;
+void
+usage(char *name, const char *optstr)
 {
     fprintf(stderr, "Usage: %s ", name);
     while (*optstr) {
