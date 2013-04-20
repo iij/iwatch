@@ -10,13 +10,6 @@
  * 2. Redistribution with functional modification must include
  *    prominent notice stating how and when and by whom it is
  *    modified.
- * 3. Redistributions in binary form have to be along with the source
- *    code or documentation which include above copyright notice, this
- *    list of conditions and the following disclaimer.
- * 4. All commercial advertising materials mentioning features or use
- *    of this software must display the following acknowledgement:
- *	This product includes software developed by Internet
- *	Initiative Japan Inc.
  *
  * THIS SOFTWARE IS PROVIDED BY ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
