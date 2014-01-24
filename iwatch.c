@@ -229,7 +229,8 @@ input:
 		to.tv_usec = 0;
 		FD_ZERO(&readfds);
 		FD_SET(fileno(stdin), &readfds);
-		nfds = select(1, &readfds, NULL, NULL, pause_status ? NULL : &to);
+		nfds = select(1, &readfds, NULL, NULL,
+		    (pause_status)? NULL : &to);
 		if (nfds < 0)
 			switch (errno) {
 			case EINTR:
@@ -322,17 +323,18 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 			}
 			/*
 		         * This method to reverse by word unit is not very fancy
-		         * but it was easy to implement.  If you are urged to rewrite
-		         * this algorithm, it is right thing and don't hesitate to do
-		         * so!
+		         * but it was easy to implement.  If you are urged to
+			 * rewrite this algorithm, it is right thing and don't
+			 * hesitate to do so!
 		         */
 			/*
-		         * If the word reverse option is specified and the current
-		         * character is not a space, track back to the beginning
-		         * of the word.
+		         * If the word reverse option is specified and the
+			 * current character is not a space, track back to the
+			 * beginning of the word.
 		         */
 			if (reverse == REVERSE_WORD && !isspace((int) *p)) {
-				while (cur_line + start_column < p && !isspace((int) *(p - 1))) {
+				while (cur_line + start_column < p &&
+				    !isspace((int) *(p - 1))) {
 					p--;
 					pp--;
 					screen_x--;
@@ -354,12 +356,13 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 			screen_x++;
 
 			/*
-		         * If the word reverse option is specified, and the current
-		         * character is not a space, print the whole word which
-		         * includes current character.
+		         * If the word reverse option is specified, and the
+			 * current character is not a space, print the whole
+			 * word which includes current character.
 		         */
 			if (reverse == REVERSE_WORD) {
-				while (*p && !isspace((int) *p) && screen_x < COLS) {
+				while (*p && !isspace((int) *p) &&
+				    screen_x < COLS) {
 					addch(*p++);
 					pp++;
 					screen_x++;
@@ -544,7 +547,8 @@ kbd_command(int ch)
 		start_column = MAX(start_column - 1, 0);
 		break;
 	case 'L':
-		start_column = MIN(start_column + ((COLS - 2) / 2), MAXCOLUMN - 1);
+		start_column = MIN(start_column + ((COLS - 2) / 2),
+		    MAXCOLUMN - 1);
 		break;
 	case 'H':
 		start_column = MAX(start_column - ((COLS - 2) / 2), 0);
@@ -689,7 +693,8 @@ usage(void)
 	extern char *__progname;
 
 	fprintf(stderr,
-	    "usage: %s [-rewpd] [-i internval] [-s start_line] [-c start_column]\n"
+	    "usage: %s [-rewpd] [-i internval] [-s start_line] "
+		    "[-c start_column]\n"
 	    "       %*s command [arg ...]\n",
 	    __progname, (int) strlen(__progname), " ");
 }
