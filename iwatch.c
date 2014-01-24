@@ -92,8 +92,12 @@ time_t lastupdate;			/* last updated time */
 char execute[MAX_COMMAND_LENGTH];
 typedef char BUFFER[MAXLINE][MAXCOLUMN + 1];
 
-#define max(x, y)	((x) > (y) ? (x) : (y))
-#define min(x, y)	((x) < (y) ? (x) : (y))
+#ifndef MAX
+#define MAX(x, y)	((x) > (y) ? (x) : (y))
+#endif
+#ifndef MIN
+#define MIN(x, y)	((x) < (y) ? (x) : (y))
+#endif
 
 #define ctrl(c)		((c) & 037)
 int           main (int, char *[]);
@@ -495,29 +499,29 @@ kbd_command(int ch)
     case '\n':
     case '+':
     case 'j':
-	start_line = min(start_line + 1, MAXLINE - 1);
+	start_line = MIN(start_line + 1, MAXLINE - 1);
 	break;
     case '-':
     case 'k':
-	start_line = max(start_line - 1, 0);
+	start_line = MAX(start_line - 1, 0);
 	break;
     case 'd':
     case 'D':
     case ctrl('d'):
-	start_line = min(start_line + ((LINES - 2) / 2), MAXLINE - 1);
+	start_line = MIN(start_line + ((LINES - 2) / 2), MAXLINE - 1);
 	break;
     case 'u':
     case 'U':
     case ctrl('u'):
-	start_line = max(start_line - ((LINES - 2) / 2), 0);
+	start_line = MAX(start_line - ((LINES - 2) / 2), 0);
 	break;
     case 'f':
     case ctrl('f'):
-	start_line = min(start_line + (LINES - 2), MAXLINE - 1);
+	start_line = MIN(start_line + (LINES - 2), MAXLINE - 1);
 	break;
     case 'b':
     case ctrl('b'):
-	start_line = max(start_line - (LINES - 2), 0);
+	start_line = MAX(start_line - (LINES - 2), 0);
 	break;
     case 'g':
 	if (prefix < MAXLINE)
@@ -529,30 +533,30 @@ kbd_command(int ch)
 	 * horizontal motion
 	 */
     case 'l':
-	start_column = min(start_column + 1, MAXCOLUMN - 1);
+	start_column = MIN(start_column + 1, MAXCOLUMN - 1);
 	break;
     case 'h':
-	start_column = max(start_column - 1, 0);
+	start_column = MAX(start_column - 1, 0);
 	break;
     case 'L':
-	start_column = min(start_column + ((COLS - 2) / 2), MAXCOLUMN - 1);
+	start_column = MIN(start_column + ((COLS - 2) / 2), MAXCOLUMN - 1);
 	break;
     case 'H':
-	start_column = max(start_column - ((COLS - 2) / 2), 0);
+	start_column = MAX(start_column - ((COLS - 2) / 2), 0);
 	break;
     case ']':
     case '\t':
-	start_column = min(start_column + 8, MAXCOLUMN - 1);
+	start_column = MIN(start_column + 8, MAXCOLUMN - 1);
 	break;
     case '[':
     case '\b':
-	start_column = max(start_column - 8, 0);
+	start_column = MAX(start_column - 8, 0);
 	break;
     case '>':
-	start_column = min(start_column + (COLS - 2), MAXCOLUMN - 1);
+	start_column = MIN(start_column + (COLS - 2), MAXCOLUMN - 1);
 	break;
     case '<':
-	start_column = max(start_column - (COLS - 2), 0);
+	start_column = MAX(start_column - (COLS - 2), 0);
 	break;
     case '{':
 	start_column = 0;
