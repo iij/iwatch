@@ -1,5 +1,5 @@
 PROG=		iwatch
-LDADD+=		-lcurses -ltermcap
-DPADD+=		${LIBCURSES} ${LIBTERMCAP}
+LDADD+=		-lcurses
+DPADD+=		${LIBCURSES}
 
 .include <bsd.prog.mk>
