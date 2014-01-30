@@ -234,7 +234,13 @@ input:
 		if (nfds < 0)
 			switch (errno) {
 			case EINTR:
-				goto input;
+				/*
+				 * ncurses has changed the window size with
+				 * SIGWINCH.  call doupdate() to use the
+				 * updated window size.
+				 */
+				doupdate();
+				goto redraw;
 			default:
 				perror("select");
 			}
