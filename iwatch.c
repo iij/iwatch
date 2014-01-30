@@ -265,8 +265,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	int line /* , column */ ;
 	char *ct;
 
-	clear();
-	clearok(stdscr, 0);
+	erase();
 
 	move(0, 0);
 	printw("\"%s\" ", execute);
@@ -543,6 +542,9 @@ kbd_command(int ch)
 	case 'l':
 		start_column = MIN(start_column + 1, MAXCOLUMN - 1);
 		break;
+	case ctrl('l'):
+		clear();
+		break;
 	case 'h':
 		start_column = MAX(start_column - 1, 0);
 		break;
@@ -600,6 +602,7 @@ const char *helpmsg[] = {
 	"                                                 ",
 	" Others:                                         ",
 	"   space    update buffer                        ",
+	"   ctrl-l   refresh screen                       ",
 	"   0..9     prefix number argument               ",
 	"   r        reverse character                    ",
 	"   e        reverse entire line                  ",
