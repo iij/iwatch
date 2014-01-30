@@ -1,4 +1,4 @@
-PROG=		iwatch
+PROG=		watch
 LDADD+=		-lcurses
 DPADD+=		${LIBCURSES}
 
