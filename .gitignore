@@ -2,3 +2,4 @@ obj
 *.o
 *.manlint
 iwatch
+tags
