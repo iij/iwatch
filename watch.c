@@ -38,14 +38,6 @@
  *	Added line-reverse-mode.
  */
 
-/*
- * BUGS:
- *
- * o Buffer length check is not done in untabify() function.  This must be
- *   repaired asap.
- *
- */
-
 #include <sys/param.h>
 
 #include <ctype.h>
@@ -668,23 +660,25 @@ showhelp(void)
 void
 untabify(char *buf, int maxlen)
 {
-	int tabstop = 8;
+	int tabstop = 8, len, spaces;
 	char *p = buf;
 
-	for (p = buf; *p; p++) {
+	while (*p && p - buf < maxlen - 1) {
 		if (*p != '\t')
-			continue;
+			p++;
 		else {
-			int spaces = tabstop - ((p - buf) % tabstop);
-
-			/*
-		         * XXX: check the length!!!
-		         */
-			maxlen = maxlen;
-			bcopy(p + 1, p + spaces, strlen(p + 1) + 1);
-			memset(p, ' ', spaces);
+			spaces = tabstop - ((p - buf) % tabstop);
+			len = MIN(maxlen - (p + spaces - buf),
+			    strlen(p + 1) + 1);
+			if (len > 0)
+				memcpy(p + spaces, p + 1, len);
+			len = MIN(spaces, maxlen - 1 - (p - buf));
+			if (len > 0)
+				memset(p, ' ', len);
+			p += len;
 		}
 	}
+	*p = '\0';
 }
 
 void
