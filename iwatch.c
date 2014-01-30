@@ -702,7 +702,7 @@ usage(void)
 	extern char *__progname;
 
 	fprintf(stderr,
-	    "usage: %s [-rewpd] [-i internval] [-s start_line] "
+	    "usage: %s [-rewpd] [-i interval] [-s start_line] "
 		    "[-c start_column]\n"
 	    "       %*s command [arg ...]\n",
 	    __progname, (int) strlen(__progname), " ");
