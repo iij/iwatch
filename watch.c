@@ -22,7 +22,7 @@
  *
  * This command is slightly derived from `watch' command come with
  * BSD/OS 3.1 by BSDI, Inc., which originally came from some free
- * distribution.  However it is thoroughly expaneded and rewrote, and
+ * distribution.  However it is thoroughly expanded and rewrote, and
  * very few code segment is retained now.
  *
  * 2000-06-23, Takuya Sato @ IIJ
