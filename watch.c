@@ -186,7 +186,7 @@ main(int argc, char *argv[])
 	command_loop();
 
 	/* NOTREACHED */
-	return 0;
+	return (0);
 }
 
 void
@@ -380,7 +380,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	}
 	move(1, 0);
 	refresh();
-	return 1;
+	return (1);
 }
 
 void
@@ -430,11 +430,11 @@ kbd_command(int ch)
 	case '?':
 		showhelp();
 		refresh();
-		return RSLT_REDRAW;
+		return (RSLT_REDRAW);
 
 	case '\033':
 		prefix = 0;
-		return RSLT_REDRAW;
+		return (RSLT_REDRAW);
 
 	case '0':
 	case '1':
@@ -447,22 +447,22 @@ kbd_command(int ch)
 	case '8':
 	case '9':
 		prefix = prefix * 10 + (ch - '0');
-		return RSLT_REDRAW;
+		return (RSLT_REDRAW);
 
 		/*
 		 * Update buffer
 		 */
 	case ' ':
-		return RSLT_UPDATE;
+		return (RSLT_UPDATE);
 
 		/*
 		 * Pause switch
 		 */
 	case 'p':
 		if ((pause_status = !pause_status) != 0)
-			return RSLT_REDRAW;
+			return (RSLT_REDRAW);
 		else
-			return RSLT_UPDATE;
+			return (RSLT_UPDATE);
 
 		/*
 		 * Reverse control
@@ -496,7 +496,7 @@ kbd_command(int ch)
 			opt_interval = prefix;
 			prefix = 0;
 		}
-		return RSLT_REDRAW;
+		return (RSLT_REDRAW);
 
 		/*
 		 * Vertical motion
@@ -580,12 +580,12 @@ kbd_command(int ch)
 		break;
 
 	default:
-		return RSLT_ERROR;
+		return (RSLT_ERROR);
 
 	}
 
 	prefix = 0;
-	return RSLT_REDRAW;
+	return (RSLT_REDRAW);
 }
 
 const char *helpmsg[] = {
