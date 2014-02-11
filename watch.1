@@ -20,7 +20,7 @@
 .Os
 .Sh NAME
 .Nm watch
-.Nd watch the command output periodically
+.Nd watch the command output
 .Sh SYNOPSIS
 .Nm
 .Op Fl rewp
@@ -34,8 +34,8 @@ displays the output of the
 .Ar command
 with
 .Ar argument
-execution and update it periodically.
-The changes of the outputs can be highlighted by reversing the text.
+and update it periodically.
+The change of the output can be highlighted by reversing the text.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -50,6 +50,7 @@ Start with pausing the update.
 .It Fl i Ar interval
 Set the initial interval second of the periodically update to
 .Ar interval .
+The default value is 2.
 .It Fl s Ar start_line
 Set the line number on the output where
 .Nm
