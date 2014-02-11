@@ -1,0 +1,11 @@
+2014-02-11  YASUOKA Masahiko
+	* Added wide char support.
+2001-12-17  Kazumasa Utashiro @ IIJ
+	* Added line-reverse-mode.
+2000-06-26 Kazumasa Utashiro @ IIJ
+	* All source code was overhauled and implemented many
+	  interactive commands enabling various control from keyboard.
+	  Help screen was also implemented.
+2000-06-23  Takuya Sato @ IIJ
+	* Original expantion is done by Takuya Sato of IIJ to implement
+	  reverse option and scroll capabilty.

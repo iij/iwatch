@@ -25,17 +25,6 @@
  * distribution.  However it is thoroughly expanded and rewrote, and
  * very few code segment is retained now.
  *
- * 2000-06-23, Takuya Sato @ IIJ
- *	Original expantion is done by Takuya Sato of IIJ to implement
- *	reverse option and scroll capabilty.
- *
- * 2000-06-26, Kazumasa Utashiro @ IIJ
- *	All source code was overhauled and implemented many
- *	interactive commands enabling various control from keyboard.
- *	Help screen was also implemented.
- *
- * 2001-12-17, Kazumasa Utashiro @ IIJ
- *	Added line-reverse-mode.
  */
 /* ncurses requires this to use wchar_t */
 #define	_XOPEN_SOURCE_EXTENDED	1
