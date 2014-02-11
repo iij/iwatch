@@ -59,7 +59,6 @@ typedef enum {
  * Global symbols
  */
 int opt_interval = DEFAULT_INTERVAL;	/* interval */
-int opt_debug = 0;		/* debug option */
 reverse_mode_t
 reverse_mode = REVERSE_NONE,	/* reverse mode */
 last_reverse_mode = REVERSE_CHAR;	/* remember previous reverse mode */
@@ -129,9 +128,6 @@ main(int argc, char *argv[])
 			break;
 		case 'c':
 			start_column = atoi(optarg);
-			break;
-		case 'd':
-			opt_debug = 1;
 			break;
 		default:
 			usage();
@@ -733,7 +729,7 @@ usage(void)
 	extern char *__progname;
 
 	fprintf(stderr,
-	    "usage: %s [-rewpd] [-i interval] [-s start_line] "
+	    "usage: %s [-rewp] [-i interval] [-s start_line] "
 		    "[-c start_column]\n"
 	    "       %*s command [arg ...]\n",
 	    __progname, (int) strlen(__progname), " ");
