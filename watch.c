@@ -17,15 +17,6 @@
  * DISCLAIMED.
  */
 
-/*
- * HISTORY:
- *
- * This command is slightly derived from `watch' command come with
- * BSD/OS 3.1 by BSDI, Inc., which originally came from some free
- * distribution.  However it is thoroughly expanded and rewrote, and
- * very few code segment is retained now.
- *
- */
 /* ncurses requires this to use wchar_t */
 #define	_XOPEN_SOURCE_EXTENDED	1
 
