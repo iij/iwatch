@@ -21,14 +21,17 @@
 #define	_XOPEN_SOURCE_EXTENDED	1
 
 #include <sys/param.h>
+#include <sys/wait.h>
 
 #include <curses.h>
+#include <err.h>
 #include <errno.h>
 #include <locale.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sysexits.h>
 #include <unistd.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -51,6 +54,7 @@ typedef enum {
 	RSLT_NOTOUCH,
 	RSLT_ERROR
 }    kbd_result_t;
+
 /*
  * Global symbols
  */
@@ -67,7 +71,9 @@ time_t lastupdate;		/* last updated time */
 #define	addwch(_x)	addnwstr(&(_x), 1);
 #define	WCWIDTH(_x)	((wcwidth((_x)) > 0)? wcwidth((_x)) : 1)
 
-char execute[MAX_COMMAND_LENGTH];
+static char	  commands[MAXCOLUMN];
+static char	**commandv;
+
 typedef wchar_t BUFFER[MAXLINE][MAXCOLUMN + 1];
 
 #ifndef MAX
@@ -91,7 +97,7 @@ void usage(void);
 int
 main(int argc, char *argv[])
 {
-	int ch;
+	int	 i, ch;
 
 	setlocale(LC_ALL, "");
 	/*
@@ -141,18 +147,18 @@ main(int argc, char *argv[])
 		usage();
 		exit(1);
 	}
-	(void) memset(execute, 0, sizeof(execute));
-	while (*argv) {
-		if (strlen(execute) + 1 + strlen(*argv) + 1 > sizeof(execute)) {
-			fprintf(stderr, "Command name is too long\n");
-			exit(1);
-		}
-		if (*execute)
-			strlcat(execute, " ", sizeof(execute));
-		strlcat(execute, *argv, sizeof(execute));
-		argv++;
-		argc--;
+
+	if ((commandv = calloc(argc + 1, sizeof(char *))) == NULL)
+		err(EX_UNAVAILABLE, "calloc");
+
+	commands[0] = '\0';
+	for (i = 0; i < argc; i++) {
+		commandv[i] = argv[i];
+		if (i != 0)
+			strlcat(commands, " ", sizeof(commands));
+		strlcat(commands, argv[i], sizeof(commands));
 	}
+	commandv[i] = NULL;
 
 	/*
          * Initialize signal
@@ -253,7 +259,10 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	erase();
 
 	move(0, 0);
-	printw("\"%s\" ", execute);
+	if (strlen(commands) > COLS - 47) 
+		printw("\"%-.*s..\" ", COLS - 49, commands);
+	else
+		printw("\"%s\" ", commands);
 	if (pause_status)
 		printw("--PAUSE--");
 	else
@@ -264,12 +273,13 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	move(0, COLS - strlen(ct));
 	addstr(ct);
 
-#define MODELINE(HOTKEY,SWITCH,MODE) { \
-	printw(HOTKEY); \
-	if (reverse == SWITCH) standout(); \
-	printw(MODE); \
-	if (reverse == SWITCH) standend(); \
-}
+#define MODELINE(HOTKEY,SWITCH,MODE)			\
+	do {						\
+		printw(HOTKEY);				\
+		if (reverse == SWITCH) standout();	\
+		printw(MODE);				\
+		if (reverse == SWITCH) standend();	\
+	} while (0/* CONSTCOND */)
 
 	move(1, COLS - 47);
 	printw("Reverse mode:");
@@ -400,43 +410,50 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 }
 
 void
-read_result(BUFFER * buf)
+read_result(BUFFER *buf)
 {
-	FILE *fp;
-	int i = 0;
+	FILE	*fp;
+	int	 i = 0, st, fds[2];
+	pid_t	 pipe_pid, pid;
 
-	/*
-         * Clear buffer
-         */
+
+	/* Clear buffer */
 	memset(buf, 0, sizeof(*buf));
 
-	/*
-         * Open pipe to command
-         */
-	if ((fp = popen(execute, "r")) == (FILE *) NULL) {
-		perror("popen");
-		exit(2);
+	if (pipe(fds) == -1)
+		err(EX_OSERR, "pipe()");
+
+	if ((pipe_pid = vfork()) == -1)
+		err(EX_OSERR, "vfork()");
+	else if (pipe_pid == 0) {
+		close(fds[0]);
+		if (fds[1] != STDOUT_FILENO) {
+			dup2(fds[1], STDOUT_FILENO);
+			close(fds[1]);
+		}
+		if (execvp(commandv[0], commandv) != 0)
+			err(EX_OSERR, "execvp(%s)", commandv[0]);
+		_exit(127);
+		/* NOTREACHED */
 	}
-	/*
-         * Read command output and convert tab to spaces
-         *
-         * TODO: handle non-printable characters
-         */
-	while ((i < MAXLINE) && (fgetws((*buf)[i], MAXCOLUMN, fp) != NULL)) {
+	if ((fp = fdopen(fds[0], "r")) == NULL)
+		err(EX_OSERR, "fdopen()");
+	close(fds[1]);
+
+	/* Read command output and convert tab to spaces * */
+	while (i < MAXLINE && fgetws((*buf)[i], MAXCOLUMN, fp) != NULL) {
 		untabify((*buf)[i], sizeof((*buf)[i]));
 		i++;
 	}
+	fclose(fp);
+	do {
+		pid = waitpid(pipe_pid, &st, 0);
+	} while (pid == -1 && errno == EINTR);
 
-	/*
-         * Close it
-         */
-	pclose(fp);
-
-	/*
-         * Remember update time
-         */
+	/* Remember update time */
 	time(&lastupdate);
 }
+
 /* ch: command character */
 kbd_result_t
 kbd_command(int ch)
