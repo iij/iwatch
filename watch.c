@@ -261,8 +261,10 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 		printw("\"%s\" ", commands);
 	if (pause_status)
 		printw("--PAUSE--");
-	else
+	else if (opt_interval > 1)
 		printw("on every %d seconds", opt_interval);
+	else
+		printw("on every seconds");
 
 	ct = ctime(&lastupdate);
 	ct[24] = '\0';
