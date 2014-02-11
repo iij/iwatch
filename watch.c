@@ -153,7 +153,7 @@ main(int argc, char *argv[])
 		usage();
 		exit(1);
 	}
-	(void) bzero(execute, sizeof(execute));
+	(void) memset(execute, 0, sizeof(execute));
 	while (*argv) {
 		if (strlen(execute) + 1 + strlen(*argv) + 1 > sizeof(execute)) {
 			fprintf(stderr, "Command name is too long\n");
@@ -392,7 +392,7 @@ read_result(BUFFER * buf)
 	/*
          * Clear buffer
          */
-	bzero(buf, sizeof(*buf));
+	memset(buf, 0, sizeof(*buf));
 
 	/*
          * Open pipe to command
@@ -669,7 +669,7 @@ untabify(char *buf, int maxlen)
 		else {
 			spaces = tabstop - ((p - buf) % tabstop);
 			len = MIN(maxlen - (p + spaces - buf),
-			    strlen(p + 1) + 1);
+			    (ssize_t)strlen(p + 1) + 1);
 			if (len > 0)
 				memcpy(p + spaces, p + 1, len);
 			len = MIN(spaces, maxlen - 1 - (p - buf));
