@@ -1,0 +1,10 @@
+bin_PROGRAMS = watch
+watch_SOURCES = watch.c
+watch_LDADD = @CURSES_LIB@
+man_MANS = watch.1
+dist_man_MANS = watch.1
+
+EXTRA_DIST = watch_test.c
+
+AM_CFLAGS = -Wall -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith
+AM_CFLAGS += -Wno-sign-compare -Wno-traditional -Wreturn-type -Wswitch

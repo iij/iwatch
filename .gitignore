@@ -1,5 +1,12 @@
 obj
 *.o
 *.manlint
-iwatch
+watch
 tags
+configure.in
+config.log
+config.status
+.deps
+watch-*.tar.gz
+autom4te.cache
+GNUmakefile
