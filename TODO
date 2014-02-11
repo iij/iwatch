@@ -1,3 +1,2 @@
 * write the man page
 * unlimit MAXLINE
-* delete History from watch.c and move them to ChangeLog
