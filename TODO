@@ -1,4 +1,3 @@
 * write the man page
-* support unicode?  showing kanji causes blinking the word
 * unlimit MAXLINE
 * delete History from watch.c and move them to ChangeLog

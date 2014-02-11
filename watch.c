@@ -37,17 +37,21 @@
  * 2001-12-17, Kazumasa Utashiro @ IIJ
  *	Added line-reverse-mode.
  */
+/* ncurses requires this to use wchar_t */
+#define	_XOPEN_SOURCE_EXTENDED	1
 
 #include <sys/param.h>
 
-#include <ctype.h>
 #include <curses.h>
 #include <errno.h>
+#include <locale.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #define DEFAULT_INTERVAL 2
 #define MAXLINE 300
@@ -80,8 +84,11 @@ int prefix = 0;			/* command prefix argument */
 int pause_status = 0;		/* pause status */
 time_t lastupdate;		/* last updated time */
 
+#define	addwch(_x)	addnwstr(&(_x), 1);
+#define	WCWIDTH(_x)	((wcwidth((_x)) > 0)? wcwidth((_x)) : 1)
+
 char execute[MAX_COMMAND_LENGTH];
-typedef char BUFFER[MAXLINE][MAXCOLUMN + 1];
+typedef wchar_t BUFFER[MAXLINE][MAXCOLUMN + 1];
 
 #ifndef MAX
 #define MAX(x, y)	((x) > (y) ? (x) : (y))
@@ -97,7 +104,7 @@ int display(BUFFER *, BUFFER *, reverse_mode_t);
 void read_result(BUFFER *);
 kbd_result_t kbd_command(int);
 void showhelp(void);
-void untabify(char *, int);
+void untabify(wchar_t *, int);
 void die(int);
 void usage(void);
 
@@ -106,6 +113,7 @@ main(int argc, char *argv[])
 {
 	int ch;
 
+	setlocale(LC_ALL, "");
 	/*
          * Command line option handling
          */
@@ -259,9 +267,8 @@ input:
 int
 display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 {
-	int screen_x, screen_y;
-	int line /* , column */ ;
-	char *ct;
+	int	 i, screen_x, screen_y, cw, line, rl;
+	char	*ct;
 
 	erase();
 
@@ -303,79 +310,108 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	for (line = start_line, screen_y = 2;
 	    screen_y < LINES && line < MAXLINE && (*cur)[line][0];
 	    line++, screen_y++) {
-		char *cur_line = (*cur)[line];
-		char *p = cur_line + start_column;
-		char *prev_line = (*prev)[line];
-		char *pp = prev_line + start_column;
+		wchar_t	*cur_line, *prev_line, *p, *pp;
 
-		screen_x = 0;
-		move(screen_y, screen_x);
+		rl = 0;	/* reversing line */
+		cur_line = (*cur)[line];
+		prev_line = (*prev)[line];
 
-		while (*p && screen_x < COLS) {
-			if (reverse == REVERSE_NONE || (*p == *pp)) {
-				addch(*p++);
-				pp++;
-				screen_x++;
-				continue;
-			}
-			/*
-		         * This method to reverse by word unit is not very fancy
-		         * but it was easy to implement.  If you are urged to
-			 * rewrite this algorithm, it is right thing and don't
-			 * hesitate to do so!
-		         */
-			/*
-		         * If the word reverse option is specified and the
-			 * current character is not a space, track back to the
-			 * beginning of the word.
-		         */
-			if (reverse == REVERSE_WORD && !isspace((int) *p)) {
-				while (cur_line + start_column < p &&
-				    !isspace((int) *(p - 1))) {
-					p--;
-					pp--;
-					screen_x--;
+		for (p = cur_line, cw = 0; cw < start_column; p++)
+			cw += WCWIDTH(*p);
+		screen_x = cw - start_column;
+		for (pp = prev_line, cw = 0; cw < start_column; pp++)
+			cw += WCWIDTH(*pp);
+
+		switch (reverse) {
+		case REVERSE_LINE:
+			if (wcscmp(cur_line, prev_line)) {
+				standout();
+				rl = 1;
+				for (i = 0; i < screen_x; i++) {
+					move(screen_y, i);
+					addch(' ');
 				}
-				move(screen_y, screen_x);
-			} else if (reverse == REVERSE_LINE) {
-				p = cur_line + start_column;
-				pp = prev_line + start_column;
-				screen_x = 0;
-				move(screen_y, screen_x);
 			}
-			standout();
+			/* FALLTHROUGH */
 
-			/*
-		         * Print character itself.
-		         */
-			addch(*p++);
-			pp++;
-			screen_x++;
-
-			/*
-		         * If the word reverse option is specified, and the
-			 * current character is not a space, print the whole
-			 * word which includes current character.
-		         */
-			if (reverse == REVERSE_WORD) {
-				while (*p && !isspace((int) *p) &&
-				    screen_x < COLS) {
-					addch(*p++);
+		case REVERSE_NONE:
+			move(screen_y, screen_x);
+			while (screen_x < COLS) {
+				if (*p && *p != L'\n') {
+					cw = wcwidth(*p);
+					if (screen_x + cw >= COLS)
+						break;
+					addwch(*p++);
 					pp++;
+					screen_x += cw;
+				} else if (rl) {
+					addch(' ');
 					screen_x++;
-				}
-			} else if (reverse == REVERSE_LINE) {
-				while (screen_x < COLS) {
-					if (*p && *p != '\n') {
-						addch(*p++);
-						pp++;
-					} else {
-						addch(' ');
-					}
-					screen_x++;
-				}
+				} else
+					break;
 			}
 			standend();
+			break;
+
+		case REVERSE_WORD:
+		case REVERSE_CHAR:
+			move(screen_y, screen_x);
+			while (*p && screen_x < COLS) {
+				cw = wcwidth(*p);
+				if (screen_x + cw >= COLS)
+					break;
+				if (*p == *pp) {
+					addwch(*p++);
+					pp++;
+					screen_x += cw;
+					continue;
+				}
+				/*
+				 * This method to reverse by word unit is not
+				 * very fancy but it was easy to implement.  If
+				 * you are urged to rewrite this algorithm, it
+				 * is right thing and don't hesitate to do so!
+				 */
+				/*
+				 * If the word reverse option is specified and
+				 * the current character is not a space, track
+				 * back to the beginning of the word.
+				 */
+				if (reverse == REVERSE_WORD && !iswspace(*p)) {
+					while (cur_line + start_column < p &&
+					    !iswspace(*(p - 1))) {
+						p--;
+						pp--;
+						screen_x -= wcwidth(*p);
+					}
+					move(screen_y, screen_x);
+				}
+				standout();
+
+				/* Print character itself.  */
+				cw = wcwidth(*p);
+				addwch(*p++);
+				pp++;
+				screen_x += cw;
+
+				/*
+				 * If the word reverse option is specified, and
+				 * the current character is not a space, print
+				 * the whole word which includes current
+				 * character.
+				 */
+				if (reverse == REVERSE_WORD) {
+					while (*p && !iswspace(*p) &&
+					    screen_x < COLS) {
+						cw = wcwidth(*p);
+						addwch(*p++);
+						pp++;
+						screen_x += cw;
+					}
+				}
+				standend();
+			}
+			break;
 		}
 	}
 	move(1, 0);
@@ -406,7 +442,7 @@ read_result(BUFFER * buf)
          *
          * TODO: handle non-printable characters
          */
-	while ((i < MAXLINE) && (fgets((*buf)[i], MAXCOLUMN, fp) != NULL)) {
+	while ((i < MAXLINE) && (fgetws((*buf)[i], MAXCOLUMN, fp) != NULL)) {
 		untabify((*buf)[i], sizeof((*buf)[i]));
 		i++;
 	}
@@ -658,27 +694,31 @@ showhelp(void)
 }
 
 void
-untabify(char *buf, int maxlen)
+untabify(wchar_t *buf, int maxlen)
 {
-	int tabstop = 8, len, spaces;
-	char *p = buf;
+	int	 i, tabstop = 8, len, spaces, width = 0, maxcnt;
+	wchar_t *p = buf;
 
-	while (*p && p - buf < maxlen - 1) {
-		if (*p != '\t')
+	maxcnt = maxlen / sizeof(wchar_t);
+	while (*p && p - buf < maxcnt - 1) {
+		if (*p != L'\t') {
+			width += wcwidth(*p);
 			p++;
-		else {
-			spaces = tabstop - ((p - buf) % tabstop);
-			len = MIN(maxlen - (p + spaces - buf),
-			    (ssize_t)strlen(p + 1) + 1);
+		} else {
+			spaces = tabstop - (width % tabstop);
+			len = MIN(maxcnt - (p + spaces - buf),
+			    (int)wcslen(p + 1) + 1);
 			if (len > 0)
-				memcpy(p + spaces, p + 1, len);
-			len = MIN(spaces, maxlen - 1 - (p - buf));
-			if (len > 0)
-				memset(p, ' ', len);
+				memcpy(p + spaces, p + 1,
+				    len * sizeof(wchar_t));
+			len = MIN(spaces, maxcnt - 1 - (p - buf));
+			for (i = 0; i < len; i++)
+				p[i] = L' ';
 			p += len;
+			width += len;
 		}
 	}
-	*p = '\0';
+	*p = L'\0';
 }
 
 void

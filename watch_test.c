@@ -11,8 +11,9 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
+#include <wchar.h>
 
-void (*watch_untabify)(char *buf, int maxlen) = NULL;
+void (*watch_untabify)(wchar_t *buf, int maxlen) = NULL;
 
 #define ASSERT(_cond)							\
 	if (!(_cond)) {							\
@@ -24,32 +25,50 @@ void (*watch_untabify)(char *buf, int maxlen) = NULL;
 static void
 untabify_test(void)
 {
-	char buf[80];
+	wchar_t buf[80];
 
-	strlcpy(buf, "\tOK", sizeof(buf));
+	wcslcpy(buf, L"\tOK", sizeof(buf));
 	watch_untabify(buf, sizeof(buf));
-	ASSERT(strcmp(buf, "        OK") == 0);
+	ASSERT(wcscmp(buf, L"        OK") == 0);
 
-	strlcpy(buf, "    \tOK", sizeof(buf));
+	wcslcpy(buf, L"    \tOK", sizeof(buf));
 	watch_untabify(buf, sizeof(buf));
-	ASSERT(strcmp(buf, "        OK") == 0);
+	ASSERT(wcscmp(buf, L"        OK") == 0);
 
-	strlcpy(buf, "       \tOK", sizeof(buf));
+	wcslcpy(buf, L"       \tOK", sizeof(buf));
 	watch_untabify(buf, sizeof(buf));
-	ASSERT(strcmp(buf, "        OK") == 0);
+	ASSERT(wcscmp(buf, L"        OK") == 0);
 
 	memset(buf, 0xDD, sizeof(buf));
-	strlcpy(buf, "\tOK", sizeof(buf));
-	watch_untabify(buf, 8);
-	ASSERT(strncmp(buf, "       ", 7) == 0);
-	ASSERT((unsigned char)buf[8] == 0xDD);	/* don't overflow */
-	ASSERT((unsigned char)buf[7] == '\0');	/* null terminate */
+	wcslcpy(buf, L"\tOK", sizeof(buf));
+	watch_untabify(buf, 8 * sizeof(wchar_t));
+	ASSERT(wcsncmp(buf, L"       ", 7) == 0);
+	ASSERT(*((u_char *)&buf[8]) == 0xdd)	/* don't overflow */
+	ASSERT(buf[7] == L'\0');		/* null terminate */
 
 	memset(buf, 0xDD, sizeof(buf));
-	strlcpy(buf, "\tOKOK", sizeof(buf));
-	watch_untabify(buf, 11);
-	ASSERT(strcmp(buf, "        OK") == 0);
-	ASSERT((unsigned char)buf[11] == 0xDD);	/* don't overflow */
+	wcslcpy(buf, L"\tOKOK", sizeof(buf));
+	watch_untabify(buf, 11 * sizeof(wchar_t));
+	ASSERT(wcscmp(buf, L"        OK") == 0);
+	ASSERT(*((u_char *)&buf[11]) == 0xdd)	/* don't overflow */
+}
+
+static void
+untabify_test2(void)
+{
+	wchar_t buf[80];
+
+	wcslcpy(buf, L"\t\u4e86\u89e3", sizeof(buf));
+	watch_untabify(buf, sizeof(buf));
+	ASSERT(wcscmp(buf, L"        \u4e86\u89e3") == 0);
+
+	wcslcpy(buf, L"  \t\u4e86\u89e3", sizeof(buf));
+	watch_untabify(buf, sizeof(buf));
+	ASSERT(wcscmp(buf, L"        \u4e86\u89e3") == 0);
+
+	wcslcpy(buf, L"     \t\u4e86\u89e3", sizeof(buf));
+	watch_untabify(buf, sizeof(buf));
+	ASSERT(wcscmp(buf, L"        \u4e86\u89e3") == 0);
 }
 
 #define	TEST(_f)				\
@@ -80,6 +99,7 @@ main(int argc, char *argv[])
 		errx(1, "dlsum(, untabify) failed");
 
 	TEST(untabify_test);
+	TEST(untabify_test2);
 
 	exit(EXIT_SUCCESS);
 }

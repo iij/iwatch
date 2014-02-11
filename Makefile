@@ -1,7 +1,8 @@
 PROG=		watch
-LDADD+=		-lcurses
+LDADD+=		-lncursesw
 DPADD+=		${LIBCURSES}
 
+CFLAGS+=	-std=c99
 CLEANFILES+=	watch_test watch.so
 
 test:
