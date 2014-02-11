@@ -20,39 +20,105 @@
 .Os
 .Sh NAME
 .Nm watch
-.Nd one line about what it does
+.Nd watch the command output periodically
 .Sh SYNOPSIS
-.\" For a program:  program [-abc] file ...
 .Nm
-.Op Fl abc
-.Ar
+.Op Fl rewp
+.Op Fl i Ar interval
+.Op Fl s Ar start_line
+.Op Fl c Ar start_column
+.Ar command Op Ar argument ...
 .Sh DESCRIPTION
+.Nm
+displays the output of the 
+.Ar command
+with
+.Ar argument
+execution and update it periodically.
+The changes of the outputs can be highlighted by reversing the text.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl r
+Reverse the changed chacter to highright.
+.It Fl e
+Reverse the changed line to highright.
+.It Fl w
+Reverse the changed word to highright.
+.It Fl p
+Start with pausing the update.
+.It Fl i Ar interval
+Set the initial interval second of the periodically update to
+.Ar interval .
+.It Fl s Ar start_line
+Set the line number on the output where
+.Nm
+is to start display.
+.It Fl c Ar start_column
+Set the column number on the output where
+.Nm
+is to start display.
+.El
+.Pp
+Certain characters cause immediate action by
+.Nm .
+These are:
+.Bl -tag -width Fl
+.It Ic k \*(Ba Ic -
+Scroll up 1 line.
+.It Ic j \*(Ba Ic Aq Ic RETURN
+Scroll down 1 line.
+.It Ic l
+Scroll right 1 column.
+.It Ic h
+Scroll left 1 column.
+.It Ic u \*(Ba Ic ^U
+Scroll up half of the screen size.
+.It Ic d \*(Ba Ic ^D
+Scroll down half of the screen size.
+.It Ic L
+Scroll right half of the screen size.
+.It Ic H
+Scroll left half of the screen size.
+.It Ic b \*(Ba Ic ^B
+Scroll up one of the screen size.
+.It Ic f \*(Ba Ic F
+Scroll down one of the screen size.
+.It Ic >
+Scroll right one of the screen size.
+.It Ic <
+Scroll left one of the screen size.
+.It Ic [
+Scroll right 8 columns.
+.It Ic ]
+Scroll left 8 columns.
+.It Ic g
+Goto the top or the prefix nubmer of lines on the output.
+.It Aq Ic SPACE
+Update the buffer by executing the command.
+.It Ic ^L
+Refresh the screen without executing the command.
+.It Ic r
+Toggle reversing the changing characters.
+.It Ic e
+Toggle reversing the changing lines.
+.It Ic w
+Toggle reversing the changing words.
+.It Ic t
+Toggle current reversing mode.
+.It Ic i
+Set the interval to the prefix number seconds.
+.It Ic i
+Toggle the pausing update output.
+.It Ic ?
+Show help message.
+.It Ic q
+Quit the program.
+.El
+.Sh HISTORY
 The
 .Nm
-utility processes files ...
-.\" The following requests should be uncommented and used where appropriate.
-.\" .Sh RETURN VALUES
-.\" For sections 2, 3, and 9 function return values only.
-.\" .Sh ENVIRONMENT
-.\" For sections 1, 6, 7 & 8 only.
-.\" .Sh FILES
-.\" .Sh EXIT STATUS
-.\" For sections 1, 6, & 8 only.
-.\" .Sh EXAMPLES
-.\" .Sh DIAGNOSTICS
-.\" For sections 1, 4, 6, 7, and 8 only.
-.\" .Sh ERRORS
-.\" For sections 2, 3, and 9 error and signal handling only.
-.\" .Sh SEE ALSO
-.\" .Xr foobar 1
-.\" .Sh STANDARDS
-.Sh HISTORY
-This command is slightly derived from
+program is slightly derived from
 .Nm watch
 command come with BSD/OS 3.1 by BSDI, Inc.,
 which originally came from some free distribution.
-However it is thoroughly expanded and rewrote,
-and very few code segment is retained now.
-.\" .Sh AUTHORS
-.\" .Sh CAVEATS
-.\" .Sh BUGS
