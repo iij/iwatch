@@ -90,7 +90,7 @@ void read_result(BUFFER *);
 kbd_result_t kbd_command(int);
 void showhelp(void);
 void untabify(wchar_t *, int);
-void die(int);
+void die(int) __dead;
 void usage(void);
 
 int
@@ -176,7 +176,7 @@ main(int argc, char *argv[])
 	command_loop();
 
 	/* NOTREACHED */
-	return (0);
+	abort();
 }
 
 void
@@ -722,7 +722,8 @@ die(int notused)
 	erase();
 	refresh();
 	endwin();
-	exit(0);
+	free(commandv);
+	exit(EXIT_SUCCESS);
 }
 
 void
