@@ -1,7 +1,16 @@
+watch
+=====
 
-こちらは、IIJ 版 watch コマンド iwatch を公開しようとする、作業中のレ
-ポジトリです。
+`watch` is a program to watch the given command's output periodically
+and watch the output change.
 
-This is working repository to open source `iwatch' command which is
-IIJ version of watch(1).
+Installation
+------------
 
+Currently OpenBSD and FreeBSD is the supported operating system.
+
+    % git clone https://github.com/iij/watch
+    % cd watch
+    % make
+    % su
+    # make BINDIR=/usr/local/bin MANDIR=/usr/local/man install

@@ -1,5 +1,9 @@
 2014-02-11  YASUOKA Masahiko
-	* Added wide char support.
+	* wide char support.
+	* execute the given command and argments keeping untouched.
+2014-01-30  YASUOKA Masahiko
+	* Add 'ctrl-l' to refresh screen.
+	* follow window size change immediately.
 2001-12-17  Kazumasa Utashiro @ IIJ
 	* Added line-reverse-mode.
 2000-06-26 Kazumasa Utashiro @ IIJ
