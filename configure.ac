@@ -16,9 +16,11 @@ AC_PROG_CC
 
 # Checks for libraries.
 AX_WITH_CURSES
-if test "x$ax_cv_ncursesw" != xyes; then
-	AC_MSG_ERROR([requires NcursesW library])
-fi
+AS_IF([test "x$ax_cv_ncursesw" != xyes],
+    # does curses support wide char? then use it
+    AC_CHECK_LIB(curses, addnwstr,
+	[CURSES_LIB="-lcurses"],
+	[AC_MSG_ERROR([requires NcursesW library])]))
 
 # Checks for header files.
 AC_CHECK_HEADERS([sys/param.h])

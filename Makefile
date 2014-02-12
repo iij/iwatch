@@ -1,13 +1,11 @@
+# This is for OpenBSD.  Please do ./configure and gmake for other OSs.
+
 PROG=		watch
-LDADD+=		-lncursesw
-DPADD+=		${LIBCURSES}
+LDADD=		-lcurses
+DPADD=		${LIBCURSES}
+CFLAGS+=	-std=gnu99
 CPPFLAGS+=	-DBSDMAKE -D_XOPEN_SOURCE_EXTENDED
 
-.ifdef .FreeBSD
-CFLAGS+=	${CPPFLAGS}
-.else
-CFLAGS+=	-std=c99
-.endif
 CLEANFILES+=	watch_test watch.so
 
 test:
