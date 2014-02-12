@@ -16,6 +16,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/* This is come from OpenBSD src/lib/libc/string/ */
+
+#include "includes.h"
+
+#ifndef HAVE_STRLCAT
+
 #include <sys/types.h>
 #include <string.h>
 
@@ -53,3 +59,4 @@ strlcat(char *dst, const char *src, size_t siz)
 
 	return(dlen + (s - src));	/* count does not include NUL */
 }
+#endif /* !HAVE_STRLCAT */

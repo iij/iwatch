@@ -1,6 +1,8 @@
 bin_PROGRAMS = watch
 watch_SOURCES = watch.c
+watch_SOURCES += compat/strlcat.c includes.h
 watch_LDADD = @CURSES_LIB@
+watch_CPPFLAGS = -D_XOPEN_SOURCE_EXTENDED
 man_MANS = watch.1
 dist_man_MANS = watch.1
 

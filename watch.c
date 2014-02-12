@@ -17,8 +17,9 @@
  * DISCLAIMED.
  */
 
-/* ncurses requires this to use wchar_t */
-#define	_XOPEN_SOURCE_EXTENDED	1
+#ifndef BSDMAKE
+#include "includes.h"
+#endif
 
 #include <sys/param.h>
 #include <sys/wait.h>
@@ -32,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
+#include <time.h>
 #include <unistd.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -90,7 +92,7 @@ void read_result(BUFFER *);
 kbd_result_t kbd_command(int);
 void showhelp(void);
 void untabify(wchar_t *, int);
-void die(int) __dead;
+void die(int);
 void usage(void);
 
 int

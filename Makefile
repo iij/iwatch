@@ -1,6 +1,7 @@
 PROG=		watch
 LDADD+=		-lncursesw
 DPADD+=		${LIBCURSES}
+CPPFLAGS+=	-DBSDMAKE -D_XOPEN_SOURCE_EXTENDED
 
 CFLAGS+=	-std=c99
 CLEANFILES+=	watch_test watch.so
