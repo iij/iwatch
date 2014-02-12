@@ -104,7 +104,7 @@ main(int argc, char *argv[])
 	/*
          * Command line option handling
          */
-	while ((ch = getopt(argc, argv, "i:rewps:c:d")) != -1)
+	while ((ch = getopt(argc, argv, "+i:rewps:c:d")) != -1)
 		switch (ch) {
 		case 'i':
 			opt_interval = atoi(optarg);

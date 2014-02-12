@@ -1,3 +1,5 @@
+2014-02-12  YASUOKA Masahiko
+	* Fix to parse the given arguments properly on Linux.
 2014-02-11  YASUOKA Masahiko
 	* wide char support.
 	* execute the given command and argments keeping untouched.
