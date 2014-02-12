@@ -1,1 +1,4 @@
 * unlimit MAXLINE
+* revert old command argments' behaviour (sh -c).  some user may rely on this.
+* option compatibilities for Linux's watch
+* support internval = 0
