@@ -23,7 +23,7 @@
 .Nd watch the command output
 .Sh SYNOPSIS
 .Nm
-.Op Fl rewp
+.Op Fl rewpx
 .Op Fl i Ar interval
 .Op Fl s Ar start_line
 .Op Fl c Ar start_column
@@ -34,8 +34,13 @@ displays the output of the
 .Ar command
 with
 .Ar argument
-and update it periodically.
-The change of the output can be highlighted by reversing the text.
+and update the output periodically.
+The changes of outputs can be highlighted by reversing the text.
+Note that shell escaping needed at the command and arguments since they
+are given to
+.Ic sh -c .
+.Fl x
+option changes this behavour.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -47,6 +52,25 @@ Reverse the changed line to highright.
 Reverse the changed word to highright.
 .It Fl p
 Start with pausing the update.
+.It Fl x
+Pass the
+.Ar command
+and
+.Ar arguments
+to
+.Xr exec 2
+as it is.
+In default behaviour,
+shell escaping is required at the
+.Ar command
+and
+.Ar argument
+because
+.Nm
+uses
+.Ic sh -c
+for handing them.
+Use this option not to do unnecessary shell escaping. 
 .It Fl i Ar interval
 Set the initial interval second of the periodically update to
 .Ar interval .
@@ -116,6 +140,9 @@ Show help message.
 .It Ic q
 Quit the program.
 .El
+.Sh SEE ALSO
+.Xr sh 1
+.Xr exec 2
 .Sh HISTORY
 The
 .Nm

@@ -1,3 +1,12 @@
+2014-02-14  YASUOKA Masahiko
+	* Revert the original way of handling of command and arguments
+	  to be able to use a pipe.  (Fix #1 issue on github.com)  It
+	  uses "sh -c" to execute the command with the arguments,
+	  therefore it requires doing "shell escape" at the arguments.
+	* Introduce new -x option to avoid using "sh -c" in handling
+	  command and arguments.  With this option, doing "shell escape"
+	  is not necessary because command and arguments will pass to
+	  exec(2) as it is.
 2014-02-12  YASUOKA Masahiko
 	* Fix to parse the given arguments properly on Linux.
 2014-02-11  YASUOKA Masahiko

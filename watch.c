@@ -28,6 +28,7 @@
 #include <err.h>
 #include <errno.h>
 #include <locale.h>
+#include <paths.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,11 +69,12 @@ int start_line = 0, start_column = 0;	/* display offset coordinates */
 int prefix = 0;			/* command prefix argument */
 int pause_status = 0;		/* pause status */
 time_t lastupdate;		/* last updated time */
+int	 xflag = 0;
 
 #define	addwch(_x)	addnwstr(&(_x), 1);
 #define	WCWIDTH(_x)	((wcwidth((_x)) > 0)? wcwidth((_x)) : 1)
 
-static char	  cmdstr[MAXCOLUMN];
+static char	 *cmdstr;
 static char	**cmdv;
 
 typedef wchar_t BUFFER[MAXLINE][MAXCOLUMN + 1];
@@ -98,13 +100,14 @@ void usage(void);
 int
 main(int argc, char *argv[])
 {
-	int	 i, ch;
+	int	 i, ch, cmdsiz = 0;
+	char	*s;
 
 	setlocale(LC_ALL, "");
 	/*
          * Command line option handling
          */
-	while ((ch = getopt(argc, argv, "+i:rewps:c:")) != -1)
+	while ((ch = getopt(argc, argv, "+i:rewps:c:x")) != -1)
 		switch (ch) {
 		case 'i':
 			opt_interval = atoi(optarg);
@@ -131,6 +134,9 @@ main(int argc, char *argv[])
 		case 'c':
 			start_column = atoi(optarg);
 			break;
+		case 'x':
+			xflag = 1;
+			break;
 		default:
 			usage();
 			exit(1);
@@ -147,16 +153,28 @@ main(int argc, char *argv[])
 	}
 
 	if ((cmdv = calloc(argc + 1, sizeof(char *))) == NULL)
-		err(EX_UNAVAILABLE, "calloc");
+		err(EX_OSERR, "calloc");
 
-	cmdstr[0] = '\0';
+	cmdstr = "";
 	for (i = 0; i < argc; i++) {
 		cmdv[i] = argv[i];
+		while (strlen(cmdstr) + strlen(argv[i]) + 3 > cmdsiz) {
+			if (cmdsiz == 0) {
+				cmdsiz = 128;
+				s = malloc(cmdsiz);
+			} else {
+				cmdsiz *= 2;
+				s = realloc(cmdstr, cmdsiz);
+			}
+			if (s == NULL)
+				err(EX_OSERR, "malloc");
+			cmdstr = s;
+		}
 		if (i != 0)
-			strlcat(cmdstr, " ", sizeof(cmdstr));
-		strlcat(cmdstr, argv[i], sizeof(cmdstr));
+			strlcat(cmdstr, " ", cmdsiz);
+		strlcat(cmdstr, argv[i], cmdsiz);
 	}
-	cmdv[i] = NULL;
+	cmdv[i++] = NULL;
 
 	/*
          * Initialize signal
@@ -416,7 +434,6 @@ read_result(BUFFER *buf)
 	int	 i = 0, st, fds[2];
 	pid_t	 pipe_pid, pid;
 
-
 	/* Clear buffer */
 	memset(buf, 0, sizeof(*buf));
 
@@ -431,8 +448,12 @@ read_result(BUFFER *buf)
 			dup2(fds[1], STDOUT_FILENO);
 			close(fds[1]);
 		}
-		if (execvp(cmdv[0], cmdv) != 0)
-			err(EX_OSERR, "execvp(%s)", cmdv[0]);
+		if (xflag)
+			execvp(cmdv[0], cmdv);
+		else
+			execl(_PATH_BSHELL, _PATH_BSHELL, "-c", cmdstr);
+
+		err(EX_OSERR, "exec(%s)", cmdv[0]);
 		_exit(127);
 		/* NOTREACHED */
 	}
