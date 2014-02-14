@@ -72,8 +72,8 @@ time_t lastupdate;		/* last updated time */
 #define	addwch(_x)	addnwstr(&(_x), 1);
 #define	WCWIDTH(_x)	((wcwidth((_x)) > 0)? wcwidth((_x)) : 1)
 
-static char	  commands[MAXCOLUMN];
-static char	**commandv;
+static char	  cmdstr[MAXCOLUMN];
+static char	**cmdv;
 
 typedef wchar_t BUFFER[MAXLINE][MAXCOLUMN + 1];
 
@@ -146,17 +146,17 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if ((commandv = calloc(argc + 1, sizeof(char *))) == NULL)
+	if ((cmdv = calloc(argc + 1, sizeof(char *))) == NULL)
 		err(EX_UNAVAILABLE, "calloc");
 
-	commands[0] = '\0';
+	cmdstr[0] = '\0';
 	for (i = 0; i < argc; i++) {
-		commandv[i] = argv[i];
+		cmdv[i] = argv[i];
 		if (i != 0)
-			strlcat(commands, " ", sizeof(commands));
-		strlcat(commands, argv[i], sizeof(commands));
+			strlcat(cmdstr, " ", sizeof(cmdstr));
+		strlcat(cmdstr, argv[i], sizeof(cmdstr));
 	}
-	commandv[i] = NULL;
+	cmdv[i] = NULL;
 
 	/*
          * Initialize signal
@@ -257,10 +257,10 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	erase();
 
 	move(0, 0);
-	if ((int)strlen(commands) > COLS - 47) 
-		printw("\"%-.*s..\" ", COLS - 49, commands);
+	if ((int)strlen(cmdstr) > COLS - 47) 
+		printw("\"%-.*s..\" ", COLS - 49, cmdstr);
 	else
-		printw("\"%s\" ", commands);
+		printw("\"%s\" ", cmdstr);
 	if (pause_status)
 		printw("--PAUSE--");
 	else if (opt_interval > 1)
@@ -431,8 +431,8 @@ read_result(BUFFER *buf)
 			dup2(fds[1], STDOUT_FILENO);
 			close(fds[1]);
 		}
-		if (execvp(commandv[0], commandv) != 0)
-			err(EX_OSERR, "execvp(%s)", commandv[0]);
+		if (execvp(cmdv[0], cmdv) != 0)
+			err(EX_OSERR, "execvp(%s)", cmdv[0]);
 		_exit(127);
 		/* NOTREACHED */
 	}
@@ -724,7 +724,7 @@ die(int notused)
 	erase();
 	refresh();
 	endwin();
-	free(commandv);
+	free(cmdv);
 	exit(EXIT_SUCCESS);
 }
 
