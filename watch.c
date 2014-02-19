@@ -202,13 +202,12 @@ main(int argc, char *argv[])
 void
 command_loop(void)
 {
-	int nfds;
-	BUFFER buf0, buf1;
-	fd_set readfds;
-	struct timeval to;
-	int i = 0;
+	int		 i, nfds;
+	BUFFER		 buf0, buf1;
+	fd_set		 readfds;
+	struct timeval	 to;
 
-	do {
+	for (i = 0; ; i++) {
 		BUFFER *cur, *prev;
 
 		if (i == 0) {
@@ -262,8 +261,7 @@ input:
 				goto input;
 			}
 		}
-		i++;
-	} while (1);
+	}
 }
 
 int
@@ -431,7 +429,7 @@ void
 read_result(BUFFER *buf)
 {
 	FILE	*fp;
-	int	 i = 0, st, fds[2];
+	int	 i, st, fds[2];
 	pid_t	 pipe_pid, pid;
 
 	/* Clear buffer */
@@ -453,10 +451,10 @@ read_result(BUFFER *buf)
 		else
 			execl(_PATH_BSHELL, _PATH_BSHELL, "-c", cmdstr);
 
-		if (execvp(commandv[0], commandv) != 0)
-			/* use warn(3) + _exit(2) not to call exit(3) */
-			warn("exec(%s)", commandv[0]);
+		/* use warn(3) + _exit(2) not to call exit(3) */
+		warn("exec(%s)", cmdstr);
 		_exit(127);
+
 		/* NOTREACHED */
 	}
 	if ((fp = fdopen(fds[0], "r")) == NULL)
@@ -464,10 +462,8 @@ read_result(BUFFER *buf)
 	close(fds[1]);
 
 	/* Read command output and convert tab to spaces * */
-	while (i < MAXLINE && fgetws((*buf)[i], MAXCOLUMN, fp) != NULL) {
+	for (i = 0; i < MAXLINE && fgetws((*buf)[i], MAXCOLUMN, fp) != NULL; i++)
 		untabify((*buf)[i], sizeof((*buf)[i]));
-		i++;
-	}
 	fclose(fp);
 	do {
 		pid = waitpid(pipe_pid, &st, 0);
