@@ -453,7 +453,9 @@ read_result(BUFFER *buf)
 		else
 			execl(_PATH_BSHELL, _PATH_BSHELL, "-c", cmdstr);
 
-		err(EX_OSERR, "exec(%s)", cmdv[0]);
+		if (execvp(commandv[0], commandv) != 0)
+			/* use warn(3) + _exit(2) not to call exit(3) */
+			warn("exec(%s)", commandv[0]);
 		_exit(127);
 		/* NOTREACHED */
 	}
