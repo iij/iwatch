@@ -76,7 +76,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = watch$(EXEEXT)
+bin_PROGRAMS = iwatch$(EXEEXT)
 subdir = .
 DIST_COMMON = $(srcdir)/GNUmakefile.in $(srcdir)/GNUmakefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
@@ -96,10 +96,10 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am_watch_OBJECTS = watch-watch.$(OBJEXT) \
-	compat/watch-strlcat.$(OBJEXT)
-watch_OBJECTS = $(am_watch_OBJECTS)
-watch_DEPENDENCIES =
+am_iwatch_OBJECTS = iwatch-iwatch.$(OBJEXT) \
+	compat/iwatch-strlcat.$(OBJEXT)
+iwatch_OBJECTS = $(am_iwatch_OBJECTS)
+iwatch_DEPENDENCIES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -132,8 +132,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(watch_SOURCES)
-DIST_SOURCES = $(watch_SOURCES)
+SOURCES = $(iwatch_SOURCES)
+DIST_SOURCES = $(iwatch_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -296,12 +296,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-watch_SOURCES = watch.c compat/strlcat.c includes.h
-watch_LDADD = @CURSES_LIB@
-watch_CPPFLAGS = -D_XOPEN_SOURCE_EXTENDED
-man_MANS = watch.1
-dist_man_MANS = watch.1
-EXTRA_DIST = watch_test.c
+iwatch_SOURCES = iwatch.c compat/strlcat.c includes.h
+iwatch_LDADD = @CURSES_LIB@
+iwatch_CPPFLAGS = -D_XOPEN_SOURCE_EXTENDED
+man_MANS = iwatch.1
+dist_man_MANS = iwatch.1
+EXTRA_DIST = iwatch_test.c
 AM_CFLAGS = -Wall -Wstrict-prototypes -Wmissing-prototypes \
 	-Wpointer-arith -Wno-sign-compare -Wno-traditional \
 	-Wreturn-type -Wswitch
@@ -407,12 +407,12 @@ compat/$(am__dirstamp):
 compat/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) compat/$(DEPDIR)
 	@: > compat/$(DEPDIR)/$(am__dirstamp)
-compat/watch-strlcat.$(OBJEXT): compat/$(am__dirstamp) \
+compat/iwatch-strlcat.$(OBJEXT): compat/$(am__dirstamp) \
 	compat/$(DEPDIR)/$(am__dirstamp)
 
-watch$(EXEEXT): $(watch_OBJECTS) $(watch_DEPENDENCIES) $(EXTRA_watch_DEPENDENCIES) 
-	@rm -f watch$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(watch_OBJECTS) $(watch_LDADD) $(LIBS)
+iwatch$(EXEEXT): $(iwatch_OBJECTS) $(iwatch_DEPENDENCIES) $(EXTRA_iwatch_DEPENDENCIES) 
+	@rm -f iwatch$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(iwatch_OBJECTS) $(iwatch_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -421,8 +421,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/watch-watch.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@compat/$(DEPDIR)/watch-strlcat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iwatch-iwatch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@compat/$(DEPDIR)/iwatch-strlcat.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -440,33 +440,33 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-watch-watch.o: watch.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT watch-watch.o -MD -MP -MF $(DEPDIR)/watch-watch.Tpo -c -o watch-watch.o `test -f 'watch.c' || echo '$(srcdir)/'`watch.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/watch-watch.Tpo $(DEPDIR)/watch-watch.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='watch.c' object='watch-watch.o' libtool=no @AMDEPBACKSLASH@
+iwatch-iwatch.o: iwatch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iwatch-iwatch.o -MD -MP -MF $(DEPDIR)/iwatch-iwatch.Tpo -c -o iwatch-iwatch.o `test -f 'iwatch.c' || echo '$(srcdir)/'`iwatch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/iwatch-iwatch.Tpo $(DEPDIR)/iwatch-iwatch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='iwatch.c' object='iwatch-iwatch.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o watch-watch.o `test -f 'watch.c' || echo '$(srcdir)/'`watch.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iwatch-iwatch.o `test -f 'iwatch.c' || echo '$(srcdir)/'`iwatch.c
 
-watch-watch.obj: watch.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT watch-watch.obj -MD -MP -MF $(DEPDIR)/watch-watch.Tpo -c -o watch-watch.obj `if test -f 'watch.c'; then $(CYGPATH_W) 'watch.c'; else $(CYGPATH_W) '$(srcdir)/watch.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/watch-watch.Tpo $(DEPDIR)/watch-watch.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='watch.c' object='watch-watch.obj' libtool=no @AMDEPBACKSLASH@
+iwatch-iwatch.obj: iwatch.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iwatch-iwatch.obj -MD -MP -MF $(DEPDIR)/iwatch-iwatch.Tpo -c -o iwatch-iwatch.obj `if test -f 'iwatch.c'; then $(CYGPATH_W) 'iwatch.c'; else $(CYGPATH_W) '$(srcdir)/iwatch.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/iwatch-iwatch.Tpo $(DEPDIR)/iwatch-iwatch.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='iwatch.c' object='iwatch-iwatch.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o watch-watch.obj `if test -f 'watch.c'; then $(CYGPATH_W) 'watch.c'; else $(CYGPATH_W) '$(srcdir)/watch.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iwatch-iwatch.obj `if test -f 'iwatch.c'; then $(CYGPATH_W) 'iwatch.c'; else $(CYGPATH_W) '$(srcdir)/iwatch.c'; fi`
 
-compat/watch-strlcat.o: compat/strlcat.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT compat/watch-strlcat.o -MD -MP -MF compat/$(DEPDIR)/watch-strlcat.Tpo -c -o compat/watch-strlcat.o `test -f 'compat/strlcat.c' || echo '$(srcdir)/'`compat/strlcat.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) compat/$(DEPDIR)/watch-strlcat.Tpo compat/$(DEPDIR)/watch-strlcat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='compat/strlcat.c' object='compat/watch-strlcat.o' libtool=no @AMDEPBACKSLASH@
+compat/iwatch-strlcat.o: compat/strlcat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT compat/iwatch-strlcat.o -MD -MP -MF compat/$(DEPDIR)/iwatch-strlcat.Tpo -c -o compat/iwatch-strlcat.o `test -f 'compat/strlcat.c' || echo '$(srcdir)/'`compat/strlcat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) compat/$(DEPDIR)/iwatch-strlcat.Tpo compat/$(DEPDIR)/iwatch-strlcat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='compat/strlcat.c' object='compat/iwatch-strlcat.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o compat/watch-strlcat.o `test -f 'compat/strlcat.c' || echo '$(srcdir)/'`compat/strlcat.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o compat/iwatch-strlcat.o `test -f 'compat/strlcat.c' || echo '$(srcdir)/'`compat/strlcat.c
 
-compat/watch-strlcat.obj: compat/strlcat.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT compat/watch-strlcat.obj -MD -MP -MF compat/$(DEPDIR)/watch-strlcat.Tpo -c -o compat/watch-strlcat.obj `if test -f 'compat/strlcat.c'; then $(CYGPATH_W) 'compat/strlcat.c'; else $(CYGPATH_W) '$(srcdir)/compat/strlcat.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) compat/$(DEPDIR)/watch-strlcat.Tpo compat/$(DEPDIR)/watch-strlcat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='compat/strlcat.c' object='compat/watch-strlcat.obj' libtool=no @AMDEPBACKSLASH@
+compat/iwatch-strlcat.obj: compat/strlcat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT compat/iwatch-strlcat.obj -MD -MP -MF compat/$(DEPDIR)/iwatch-strlcat.Tpo -c -o compat/iwatch-strlcat.obj `if test -f 'compat/strlcat.c'; then $(CYGPATH_W) 'compat/strlcat.c'; else $(CYGPATH_W) '$(srcdir)/compat/strlcat.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) compat/$(DEPDIR)/iwatch-strlcat.Tpo compat/$(DEPDIR)/iwatch-strlcat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='compat/strlcat.c' object='compat/iwatch-strlcat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(watch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o compat/watch-strlcat.obj `if test -f 'compat/strlcat.c'; then $(CYGPATH_W) 'compat/strlcat.c'; else $(CYGPATH_W) '$(srcdir)/compat/strlcat.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(iwatch_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o compat/iwatch-strlcat.obj `if test -f 'compat/strlcat.c'; then $(CYGPATH_W) 'compat/strlcat.c'; else $(CYGPATH_W) '$(srcdir)/compat/strlcat.c'; fi`
 install-man1: $(dist_man_MANS) $(man_MANS)
 	@$(NORMAL_INSTALL)
 	@list1=''; \
