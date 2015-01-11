@@ -1,12 +1,12 @@
-bin_PROGRAMS = watch
-watch_SOURCES = watch.c
-watch_SOURCES += compat/strlcat.c includes.h
-watch_LDADD = @CURSES_LIB@
-watch_CPPFLAGS = -D_XOPEN_SOURCE_EXTENDED
-man_MANS = watch.1
-dist_man_MANS = watch.1
+bin_PROGRAMS = iwatch
+iwatch_SOURCES = iwatch.c
+iwatch_SOURCES += compat/strlcat.c includes.h
+iwatch_LDADD = @CURSES_LIB@
+iwatch_CPPFLAGS = -D_XOPEN_SOURCE_EXTENDED
+man_MANS = iwatch.1
+dist_man_MANS = iwatch.1
 
-EXTRA_DIST = watch_test.c
+EXTRA_DIST = iwatch_test.c
 
 AM_CFLAGS = -Wall -Wstrict-prototypes -Wmissing-prototypes -Wpointer-arith
 AM_CFLAGS += -Wno-sign-compare -Wno-traditional -Wreturn-type -Wswitch
