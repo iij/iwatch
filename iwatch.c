@@ -449,7 +449,7 @@ read_result(BUFFER *buf)
 		if (xflag)
 			execvp(cmdv[0], cmdv);
 		else
-			execl(_PATH_BSHELL, _PATH_BSHELL, "-c", cmdstr);
+			execl(_PATH_BSHELL, _PATH_BSHELL, "-c", cmdstr, NULL);
 
 		/* use warn(3) + _exit(2) not to call exit(3) */
 		warn("exec(%s)", cmdstr);
