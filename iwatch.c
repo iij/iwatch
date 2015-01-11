@@ -725,7 +725,7 @@ untabify(wchar_t *buf, int maxlen)
 			len = MIN(maxcnt - (p + spaces - buf),
 			    (int)wcslen(p + 1) + 1);
 			if (len > 0)
-				memcpy(p + spaces, p + 1,
+				memmove(p + spaces, p + 1,
 				    len * sizeof(wchar_t));
 			len = MIN(spaces, maxcnt - 1 - (p - buf));
 			for (i = 0; i < len; i++)

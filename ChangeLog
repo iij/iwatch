@@ -1,4 +1,5 @@
 2015-01-12  YASUOKA Masahiko
+	* Fix not to use memcpy to copy overlapped memory.
 	* Add missing the NULL terminate argument for execl(3)
 	* Call this problem "iwatch" that is the original name.
 	  Suggested by utashiro.
