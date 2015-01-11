@@ -273,7 +273,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	erase();
 
 	move(0, 0);
-	if ((int)strlen(cmdstr) > COLS - 47) 
+	if ((int)strlen(cmdstr) > COLS - 47)
 		printw("\"%-.*s..\" ", COLS - 49, cmdstr);
 	else
 		printw("\"%s\" ", cmdstr);

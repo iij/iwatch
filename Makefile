@@ -10,7 +10,7 @@ CLEANFILES+=	iwatch_test iwatch.so
 
 test:
 	${CC} ${CFLAGS} ${CPPFLAGS} -O0 -g -fPIC -shared -o iwatch.so ${.CURDIR}/iwatch.c ${LDADD}
-	${CC} ${CFLAGS} ${CPPFLAGS} -O0 -g -o iwatch_test ${.CURDIR}/watch_test.c
+	${CC} ${CFLAGS} ${CPPFLAGS} -O0 -g -o iwatch_test ${.CURDIR}/iwatch_test.c
 	./iwatch_test
 	
 .include <bsd.prog.mk>

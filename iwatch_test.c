@@ -83,7 +83,7 @@ int
 main(int argc, char *argv[])
 {
 	void		*watch;
-	const char	*objname = "./watch.so";
+	const char	*objname = "./iwatch.so";
 
 	argv++;
 	argc--;
