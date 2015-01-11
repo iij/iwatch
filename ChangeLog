@@ -1,4 +1,5 @@
 2015-01-12  YASUOKA Masahiko
+	* Tweak the man page
 	* Update README.md
 	* Fix not to use memcpy to copy overlapped memory.
 	* Add missing the NULL terminate argument for execl(3)
