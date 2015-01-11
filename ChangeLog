@@ -1,3 +1,6 @@
+2015-01-12  YASUOKA Masahiko
+	* Call this problem "iwatch" that is the original name.
+	  Suggested by utashiro.
 2014-02-19  YASUOKA Masahiko
 	* Fix not to display a garbage when exec(2) fails.
 2014-02-14  YASUOKA Masahiko
