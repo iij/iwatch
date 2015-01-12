@@ -1,4 +1,7 @@
 2015-01-12  YASUOKA Masahiko
+	* Fix crash if the malloc() returns uninitialized memory since the
+	  buffer was not initialized where it is expected.  (From jca at
+	  wxcvbn.org)
 	* Tweak the man page
 	* Update README.md
 	* Fix not to use memcpy to copy overlapped memory.

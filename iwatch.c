@@ -161,7 +161,7 @@ main(int argc, char *argv[])
 		while (strlen(cmdstr) + strlen(argv[i]) + 3 > cmdsiz) {
 			if (cmdsiz == 0) {
 				cmdsiz = 128;
-				s = malloc(cmdsiz);
+				s = calloc(cmdsiz, 1);
 			} else {
 				cmdsiz *= 2;
 				s = realloc(cmdstr, cmdsiz);
