@@ -1,11 +1,14 @@
 2015-01-12  YASUOKA Masahiko
+	* Update to 1.0.2
 	* Fix crash if the malloc() returns uninitialized memory since the
 	  buffer was not initialized where it is expected.  (From jca at
 	  wxcvbn.org)
+	* Update to 1.0.1
 	* Tweak the man page
 	* Update README.md
 	* Fix not to use memcpy to copy overlapped memory.
 	* Add missing the NULL terminate argument for execl(3)
+	* Update to 1.0.0
 	* Call this problem "iwatch" that is the original name.
 	  Suggested by utashiro.
 2014-02-19  YASUOKA Masahiko
