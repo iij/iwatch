@@ -30,4 +30,6 @@ AC_CHECK_FUNCS([strlcat])
 
 AC_CONFIG_FILES([GNUmakefile])
 
+AM_MAINTAINER_MODE([disable])
+
 AC_OUTPUT
