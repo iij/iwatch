@@ -1,4 +1,5 @@
 2015-01-16  YASUOKA Masahiko
+	* Update to 1.0.3
 	* iwatch.1 was installed twice (gnu make only)  (pointed out
 	  r-yoneda at iij)
 2015-01-15  YASUOKA Masahiko
