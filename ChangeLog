@@ -1,3 +1,6 @@
+2015-01-16  YASUOKA Masahiko
+	* iwatch.1 was installed twice (gnu make only)  (pointed out
+	  r-yoneda at iij)
 2015-01-15  YASUOKA Masahiko
 	* Disable maintainer mode on configure by default.  (suggested by
 	  koga at iij)

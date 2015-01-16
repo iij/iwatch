@@ -3,7 +3,6 @@ iwatch_SOURCES = iwatch.c
 iwatch_SOURCES += compat/strlcat.c includes.h
 iwatch_LDADD = @CURSES_LIB@
 iwatch_CPPFLAGS = -D_XOPEN_SOURCE_EXTENDED
-man_MANS = iwatch.1
 dist_man_MANS = iwatch.1
 
 EXTRA_DIST = iwatch_test.c
