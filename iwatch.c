@@ -21,7 +21,7 @@
 #include "includes.h"
 #endif
 
-#include <sys/param.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 
 #include <curses.h>
