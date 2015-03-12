@@ -1,5 +1,5 @@
-watch
-=====
+iwatch
+======
 
 `iwatch` is a program to watch the given command's output periodically
 and watch the output change.
