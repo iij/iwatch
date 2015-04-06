@@ -111,7 +111,7 @@ main(int argc, char *argv[])
 		switch (ch) {
 		case 'i':
 			opt_interval = atoi(optarg);
-			if (opt_interval == 0 || argc < 3) {
+			if (opt_interval == 0) {
 				usage();
 				exit(1);
 			}
