@@ -113,7 +113,7 @@ main(int argc, char *argv[])
 			opt_interval = atoi(optarg);
 			if (opt_interval == 0) {
 				usage();
-				exit(1);
+				exit(EX_USAGE);
 			}
 			break;
 		case 'r':
@@ -139,7 +139,7 @@ main(int argc, char *argv[])
 			break;
 		default:
 			usage();
-			exit(1);
+			exit(EX_USAGE);
 		}
 	argc -= optind;
 	argv += optind;
@@ -149,7 +149,7 @@ main(int argc, char *argv[])
          */
 	if (argc <= 0) {
 		usage();
-		exit(1);
+		exit(EX_USAGE);
 	}
 
 	if ((cmdv = calloc(argc + 1, sizeof(char *))) == NULL)
@@ -453,7 +453,7 @@ read_result(BUFFER *buf)
 
 		/* use warn(3) + _exit(2) not to call exit(3) */
 		warn("exec(%s)", cmdstr);
-		_exit(127);
+		_exit(EX_OSERR);
 
 		/* NOTREACHED */
 	}
