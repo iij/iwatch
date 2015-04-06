@@ -94,7 +94,8 @@ void read_result(BUFFER *);
 kbd_result_t kbd_command(int);
 void showhelp(void);
 void untabify(wchar_t *, int);
-void die(int);
+void on_signal(int);
+void quit();
 void usage(void);
 
 int
@@ -179,9 +180,9 @@ main(int argc, char *argv[])
 	/*
          * Initialize signal
          */
-	(void) signal(SIGINT, die);
-	(void) signal(SIGTERM, die);
-	(void) signal(SIGHUP, die);
+	(void) signal(SIGINT, on_signal);
+	(void) signal(SIGTERM, on_signal);
+	(void) signal(SIGHUP, on_signal);
 
 	/*
          * Initialize curses environment
@@ -628,7 +629,7 @@ kbd_command(int ch)
 		 */
 	case 'q':
 	case 'Q':
-		die(0);
+		quit();
 		break;
 
 	default:
@@ -738,7 +739,13 @@ untabify(wchar_t *buf, int maxlen)
 }
 
 void
-die(int notused)
+on_signal(int signum)
+{
+	quit();
+}
+
+void
+quit(void)
 {
 	erase();
 	refresh();
