@@ -1,3 +1,4 @@
+.*.swp
 *.manlint
 *.o
 *~
@@ -11,7 +12,9 @@ config.status
 configure.in
 obj
 tags
-watch
-watch-*.tar.gz
-watch.cat1
-watch.html1
+iwatch
+iwatch.so
+iwatch_test
+iwatch-*.tar.gz
+iwatch.cat1
+iwatch.html1

@@ -283,7 +283,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	else if (opt_interval > 1)
 		printw("on every %d seconds", opt_interval);
 	else
-		printw("on every seconds");
+		printw("on every second");
 
 	ct = ctime(&lastupdate);
 	ct[24] = '\0';
