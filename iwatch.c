@@ -76,6 +76,7 @@ int	 xflag = 0;
 
 static char	 *cmdstr;
 static char	**cmdv;
+static int	  style = A_REVERSE;
 
 typedef wchar_t BUFFER[MAXLINE][MAXCOLUMN + 1];
 
@@ -97,6 +98,10 @@ void untabify(wchar_t *, int);
 void on_signal(int);
 void quit();
 void usage(void);
+void set_attr(void);
+void parse_style(void);
+int get_color_num(const char *s);
+int get_attr_num(const char *s);
 
 int
 main(int argc, char *argv[])
@@ -188,6 +193,9 @@ main(int argc, char *argv[])
          * Initialize curses environment
          */
 	initscr();
+	start_color();
+	use_default_colors();
+	parse_style();
 	noecho();
 	crmode();
 
@@ -290,12 +298,12 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	move(0, COLS - strlen(ct));
 	addstr(ct);
 
-#define MODELINE(HOTKEY,SWITCH,MODE)			\
-	do {						\
-		printw(HOTKEY);				\
-		if (reverse == SWITCH) standout();	\
-		printw(MODE);				\
-		if (reverse == SWITCH) standend();	\
+#define MODELINE(HOTKEY,SWITCH,MODE)				\
+	do {							\
+		printw(HOTKEY);					\
+		if (reverse == SWITCH) attron(style);		\
+		printw(MODE);					\
+		if (reverse == SWITCH) attrset(A_NORMAL);	\
 	} while (0/* CONSTCOND */)
 
 	move(1, COLS - 47);
@@ -332,7 +340,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 		switch (reverse) {
 		case REVERSE_LINE:
 			if (wcscmp(cur_line, prev_line)) {
-				standout();
+				attron(style);
 				rl = 1;
 				for (i = 0; i < screen_x; i++) {
 					move(screen_y, i);
@@ -357,7 +365,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 				} else
 					break;
 			}
-			standend();
+			attrset(A_NORMAL);
 			break;
 
 		case REVERSE_WORD:
@@ -393,7 +401,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 					}
 					move(screen_y, screen_x);
 				}
-				standout();
+				attron(style);
 
 				/* Print character itself.  */
 				cw = wcwidth(*p);
@@ -416,7 +424,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 						screen_x += cw;
 					}
 				}
-				standend();
+				attrset(A_NORMAL);
 			}
 			break;
 		}
@@ -764,4 +772,60 @@ usage(void)
 		    "[-c start_column]\n"
 	    "       %*s command [arg ...]\n",
 	    __progname, (int) strlen(__progname), " ");
+}
+
+void
+parse_style(void)
+{
+	int	i, code;
+	char	*p, *st, *st0, *token;
+	struct _codestrings {
+		int		 code;
+		int		 no;
+		const char	*string;
+	} codestrings[] = {
+		{ COLOR_BLACK,		0, "black"},
+		{ COLOR_RED,		0, "red" },
+		{ COLOR_GREEN,		0, "green" },
+		{ COLOR_YELLOW,		0, "yellow" },
+		{ COLOR_BLUE,		0, "blue" },
+		{ COLOR_MAGENTA,	0, "magenta" },
+		{ COLOR_CYAN,		0, "cyan" },
+		{ COLOR_WHITE,		0, "white" },
+		{ A_UNDERLINE,		0, "underline" },
+		{ A_REVERSE,		0, "reverse" },
+		{ A_DIM,		0, "dim" },
+		{ A_BOLD,		0, "bold" },
+		{ A_UNDERLINE,		1, "nounderline" },
+		{ A_REVERSE,		1, "noreverse" },
+		{ A_DIM,		1, "nodim" },
+		{ A_BOLD,		1, "nobold" },
+		{ -1,			0, NULL }
+	};
+
+	if ((p = getenv("IWATCH_STYLE")) != NULL) {
+		st = st0 = strdup(p);
+
+		while ((token = strsep(&st, " ,")) != NULL) {
+			if (*token == '\0')
+				continue;
+			for (i = 0; codestrings[i].code != -1; i++) {
+				if (strcasecmp(token, codestrings[i].string)
+				    != 0)
+					continue;
+				code = codestrings[i].code;
+				if ((NCURSES_BITS(code, 0) & A_COLOR) != 0) {
+					init_pair(1, code, -1);
+					style &= ~A_COLOR;
+					style |= COLOR_PAIR(1);
+				} else if (code != -1) {
+					if (!codestrings[i].no)
+						style |= code;
+					else
+						style &= ~code;
+				}
+			}
+		}
+		free(st0);
+	}
 }
