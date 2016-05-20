@@ -43,6 +43,7 @@
 #define MAXLINE 300
 #define MAXCOLUMN 180
 #define MAX_COMMAND_LENGTH 128
+#define INVERSE_OF_MICRO 1000000
 
 typedef enum {
 	REVERSE_NONE,
@@ -61,15 +62,24 @@ typedef enum {
 /*
  * Global symbols
  */
-int opt_interval = DEFAULT_INTERVAL;	/* interval */
+int opt_interval[2] = { DEFAULT_INTERVAL, 0 }; /* interval
+						* { integral, decimal } */
 reverse_mode_t
-reverse_mode = REVERSE_NONE,	/* reverse mode */
+reverse_mode = REVERSE_NONE,		/* reverse mode */
 last_reverse_mode = REVERSE_CHAR;	/* remember previous reverse mode */
 int start_line = 0, start_column = 0;	/* display offset coordinates */
-int prefix = 0;			/* command prefix argument */
+int prefix[2];				/* command prefix argument
+					   { integral, decimal } */
+int decimal_point = 0;			/* whether press decimal point when
+					   entering prefix */
+int ten_power = INVERSE_OF_MICRO;	/* this is devided by 10 every time
+					   entering a prefix character
+					   on the decimal fraction */
+int prefix_decimal_flag = 0;		/* prevent unnecessary output 0
+					   if not any prefix input */
 int pause_status = 0;		/* pause status */
 time_t lastupdate;		/* last updated time */
-int	 xflag = 0;
+int xflag = 0;
 
 #define	addwch(_x)	addnwstr(&(_x), 1);
 #define	WCWIDTH(_x)	((wcwidth((_x)) > 0)? wcwidth((_x)) : 1)
@@ -107,7 +117,8 @@ int
 main(int argc, char *argv[])
 {
 	int	 i, ch, cmdsiz = 0;
-	char	*s;
+	char	*e, *s;
+	double	 intvl;
 
 	setlocale(LC_ALL, "");
 	/*
@@ -116,11 +127,15 @@ main(int argc, char *argv[])
 	while ((ch = getopt(argc, argv, "+i:rewps:c:x")) != -1)
 		switch (ch) {
 		case 'i':
-			opt_interval = atoi(optarg);
-			if (opt_interval == 0) {
-				usage();
-				exit(EX_USAGE);
-			}
+			intvl = strtod(optarg, &e);
+			if (*optarg == '\0' || *e != '\0')
+				errx(EX_USAGE, "invalid interval: %s", optarg);
+			if (*optarg == '-')
+				errx(EX_USAGE, "interval must be positive: %s",
+					optarg);
+			opt_interval[0] = (int)intvl;
+			opt_interval[1] = (int)(intvl * INVERSE_OF_MICRO) %
+				INVERSE_OF_MICRO;
 			break;
 		case 'r':
 			reverse_mode = REVERSE_CHAR;
@@ -235,8 +250,8 @@ redraw:
 		display(cur, prev, reverse_mode);
 
 input:
-		to.tv_sec = opt_interval;
-		to.tv_usec = 0;
+		to.tv_sec = opt_interval[0];
+		to.tv_usec = opt_interval[1];
 		FD_ZERO(&readfds);
 		FD_SET(fileno(stdin), &readfds);
 		nfds = select(1, &readfds, NULL, NULL,
@@ -276,7 +291,7 @@ input:
 int
 display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 {
-	int	 i, screen_x, screen_y, cw, line, rl;
+	int	 i, digit, tmp, screen_x, screen_y, cw, line, rl;
 	char	*ct;
 
 	erase();
@@ -288,10 +303,18 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 		printw("\"%s\" ", cmdstr);
 	if (pause_status)
 		printw("--PAUSE--");
-	else if (opt_interval > 1)
-		printw("on every %d seconds", opt_interval);
-	else
+	else if (opt_interval[0] == 1 && opt_interval[1] == 0)
 		printw("on every second");
+	else if (opt_interval[1] == 0)
+		printw("on every %d seconds", opt_interval[0]);
+	else {
+		digit = 6; tmp = opt_interval[1];
+		while(tmp % 10 == 0){
+			digit--; tmp /= 10;
+		}
+		printw("on every %d.%0*d seconds", opt_interval[0],
+		    digit, tmp);
+	}
 
 	ct = ctime(&lastupdate);
 	ct[24] = '\0';
@@ -314,8 +337,22 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	printw(" [t]toggle");
 
 	move(1, 1);
-	if (prefix)
-		printw("%d ", prefix);
+	if (prefix_decimal_flag) {
+		if (decimal_point)
+			if (ten_power != INVERSE_OF_MICRO){
+				digit = 0, tmp = INVERSE_OF_MICRO / ten_power;
+				while (tmp > 1){
+					digit++; tmp /= 10;
+				}
+				printw("%d.%0*d ", prefix[0], digit,
+					prefix[1] / ten_power);
+			}
+			else
+				printw("%d.", prefix[0]);
+		else
+			printw("%d ", prefix[0]);
+	}
+
 	if (start_line != 0 || start_column != 0)
 		printw("(%d, %d)", start_line, start_column);
 
@@ -494,7 +531,7 @@ kbd_command(int ch)
 		return (RSLT_REDRAW);
 
 	case '\033':
-		prefix = 0;
+		prefix[0] = 0;
 		return (RSLT_REDRAW);
 
 	case '0':
@@ -507,7 +544,19 @@ kbd_command(int ch)
 	case '7':
 	case '8':
 	case '9':
-		prefix = prefix * 10 + (ch - '0');
+		prefix_decimal_flag = true;
+		if (decimal_point) {
+			if (ten_power > 1){
+				ten_power /= 10;
+				prefix[1] += (ch - '0') * ten_power;
+			}
+		}
+		else
+			prefix[0] = prefix[0] * 10 + (ch - '0');
+		return (RSLT_REDRAW);
+
+	case '.':
+		decimal_point = true;
 		return (RSLT_REDRAW);
 
 		/*
@@ -553,9 +602,13 @@ kbd_command(int ch)
 		 * Set interval
 		 */
 	case 'i':
-		if (prefix > 0) {
-			opt_interval = prefix;
-			prefix = 0;
+		if (prefix[0] != 0 || prefix[1] != 0) {
+			opt_interval[0] = prefix[0];
+			opt_interval[1] = prefix[1];
+			prefix[0] = 0, prefix[1] = 0;
+			ten_power = INVERSE_OF_MICRO;
+			prefix_decimal_flag = false;
+			decimal_point = false;
 		}
 		return (RSLT_REDRAW);
 
@@ -590,9 +643,9 @@ kbd_command(int ch)
 		start_line = MAX(start_line - (LINES - 2), 0);
 		break;
 	case 'g':
-		if (prefix < MAXLINE)
-			start_line = prefix;
-		prefix = 0;
+		if (prefix[0] < MAXLINE)
+			start_line = prefix[0];
+		prefix[0] = 0;
 		break;
 
 		/*
@@ -645,7 +698,7 @@ kbd_command(int ch)
 
 	}
 
-	prefix = 0;
+	prefix[0] = 0;
 	return (RSLT_REDRAW);
 }
 
