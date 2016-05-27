@@ -1,5 +1,5 @@
 .\"
-.\" Copyright (c) 2000, 2001, 2014 Internet Initiative Japan Inc.
+.\" Copyright (c) 2000, 2001, 2014, 2016 Internet Initiative Japan Inc.
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
 .\" purpose with or without fee is hereby granted, provided that the above
@@ -30,26 +30,30 @@
 .Ar command Op Ar argument ...
 .Sh DESCRIPTION
 .Nm
-displays the output of the
+displays the output of a
 .Ar command
 with
 .Ar argument
-and update the output periodically.
-The changes of outputs can be highlighted by reversing the text.
+and update the output with a specified number of
+.Ar interval .
+The changes of outputs can be highlighted by changing attributes and color of
+the text and background (see
+.Sx STYLE
+section).
 Note that shell escaping needed at the command and arguments since they
 are given to
 .Ic sh -c .
 .Fl x
-option changes this behavour.
+option changes this behaviour.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl r
-Reverse the changed chacter to highlight.
+Highlight the changed character.
 .It Fl e
-Reverse the changed line to highlight.
+Highlight the changed line.
 .It Fl w
-Reverse the changed word to highlight.
+Highlight the changed word.
 .It Fl p
 Start with pausing the update.
 .It Fl x
@@ -72,9 +76,10 @@ uses
 for handing them.
 Use this option not to do unnecessary shell escaping.
 .It Fl i Ar interval
-Set the initial interval second of the periodically update to
+Set the initial interval second of the periodical update to
 .Ar interval .
-The default value is 2.
+This value must be positive and may be valid for the sixth decimal place.
+The default is 2 seconds.
 .It Fl s Ar start_line
 Set the line number on the output where
 .Nm
@@ -119,20 +124,24 @@ Scroll right 8 columns.
 Scroll left 8 columns.
 .It Ic g
 Goto the top or the prefix nubmer of lines on the output.
+Enter the value before press this character.
+This value must be positive.
 .It Aq Ic SPACE
 Update the buffer by executing the command.
 .It Ic ^L
 Refresh the screen without executing the command.
 .It Ic r
-Toggle reversing the changing characters.
+Toggle highlighting the changing characters.
 .It Ic e
-Toggle reversing the changing lines.
+Toggle highlighting the changing lines.
 .It Ic w
-Toggle reversing the changing words.
+Toggle highlighting the changing words.
 .It Ic t
-Toggle current reversing mode.
+Toggle current highlighting mode.
 .It Ic i
 Set the interval to the prefix number seconds.
+Enter the value before press this character.
+This value must be positive and may be valid for the sixth decimal place.
 .It Ic p
 Toggle the pausing of update output.
 .It Ic ?
@@ -140,6 +149,48 @@ Show help message.
 .It Ic q
 Quit the program.
 .El
+.Sh STYLE
+.Nm
+can change attributes and color to the part of output to highlight which is
+different from the previous output.
+This can be done by setting an environmental variable named
+.Ev IWATCH_STYLE .
+This is given as a comma-separated list to be specified.
+The default on startup is 'reverse'.
+.Pp
+The Attributes can be picked up from multiple ones, but the color must be
+selected from one or none.
+In attributes, there are ones prefixed with 'no'.
+These make the attributes turned off.
+.Pp
+For example, this may be 'yellow,dim,underline'.
+Below the lists of attributes and color you can specify:
+.Pp
+The attributes are picked up from:
+.Ic underline ,
+.Ic reverse ,
+.Ic dim ,
+.Ic bold ,
+.Ic nounderline ,
+.Ic noreverse ,
+.Ic nodim ,
+.Ic nobold .
+.Pp
+The color is one of:
+.Ic black ,
+.Ic red ,
+.Ic green ,
+.Ic yellow ,
+.Ic blue ,
+.Ic magenta ,
+.Ic cyan ,
+.Ic white .
+.Sh ENVIRONMENT
+.Bl -tag -width IWATCH_STYLE
+.It Ev IWATCH_STYLE
+Set attributes and color to the updated output (See
+.Sx STYLE
+Section).
 .Sh SEE ALSO
 .Xr sh 1
 .Xr exec 2
