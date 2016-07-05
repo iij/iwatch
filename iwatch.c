@@ -43,9 +43,9 @@
 #define MAXLINE 300
 #define MAXCOLUMN 180
 #define MAX_COMMAND_LENGTH 128
-#define INVERSE_OF_MICRO 1000000
 
 #define NUM_FRAQ_DIGITS_USEC	6	/* number of fractal digits for usec */
+#define MAX_FRAQ_DIGITS		3	/* max number of fractal digits */
 
 typedef enum {
 	REVERSE_NONE,
@@ -69,15 +69,9 @@ reverse_mode_t
 reverse_mode = REVERSE_NONE,		/* reverse mode */
 last_reverse_mode = REVERSE_CHAR;	/* remember previous reverse mode */
 int start_line = 0, start_column = 0;	/* display offset coordinates */
-int prefix[2];				/* command prefix argument
-					   { integral, decimal } */
-int decimal_point = 0;			/* whether press decimal point when
-					   entering prefix */
-int ten_power = INVERSE_OF_MICRO;	/* this is devided by 10 every time
-					   entering a prefix character
-					   on the decimal fraction */
-int prefix_decimal_flag = 0;		/* prevent unnecessary output 0
-					   if not any prefix input */
+int prefix = -1;		/* command prefix argument */
+int decimal_point = -1;		/* position of decimal point.  */
+
 int pause_status = 0;		/* pause status */
 time_t lastupdate;		/* last updated time */
 int xflag = 0;
@@ -136,7 +130,7 @@ main(int argc, char *argv[])
 					optarg);
 			opt_interval.tv_sec = (int)intvl;
 			opt_interval.tv_usec = (u_long)
-			    (intvl * INVERSE_OF_MICRO) % INVERSE_OF_MICRO;
+			    (intvl * 1000000UL) % 1000000UL;
 			break;
 		case 'r':
 			reverse_mode = REVERSE_CHAR;
@@ -335,20 +329,19 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 	printw(" [t]toggle");
 
 	move(1, 1);
-	if (prefix_decimal_flag) {
-		if (decimal_point)
-			if (ten_power != INVERSE_OF_MICRO){
-				digit = 0, tmp = INVERSE_OF_MICRO / ten_power;
-				while (tmp > 1){
-					digit++; tmp /= 10;
-				}
-				printw("%d.%0*d ", prefix[0], digit,
-					prefix[1] / ten_power);
-			}
-			else
-				printw("%d.", prefix[0]);
+	if (prefix >= 0) {
+		if (decimal_point > 0) {
+			int power10;
+
+			for (i = 0, power10 = 1; i < decimal_point; i++)
+				power10 *= 10;
+
+			printw("%d.%*0d", prefix / power10, decimal_point,
+			    prefix % power10);
+		} else if (decimal_point == 0)
+			printw("%d. ", prefix);
 		else
-			printw("%d ", prefix[0]);
+			printw("%d ", prefix);
 	}
 
 	if (start_line != 0 || start_column != 0)
@@ -530,7 +523,7 @@ kbd_command(int ch)
 		return (RSLT_REDRAW);
 
 	case '\033':
-		prefix[0] = 0;
+		prefix = -1;
 		return (RSLT_REDRAW);
 
 	case '0':
@@ -543,19 +536,21 @@ kbd_command(int ch)
 	case '7':
 	case '8':
 	case '9':
-		prefix_decimal_flag = true;
-		if (decimal_point) {
-			if (ten_power > 1){
-				ten_power /= 10;
-				prefix[1] += (ch - '0') * ten_power;
-			}
+		if (prefix < 0) {
+			prefix = 0;
+			decimal_point = -1;
 		}
-		else
-			prefix[0] = prefix[0] * 10 + (ch - '0');
+		if (decimal_point >= MAX_FRAQ_DIGITS)
+			return (RSLT_REDRAW);
+
+		if (decimal_point >= 0)
+			decimal_point++;
+		prefix = prefix * 10 + (ch - '0');
 		return (RSLT_REDRAW);
 
 	case '.':
-		decimal_point = true;
+		if (decimal_point < 0)
+			decimal_point = 0;
 		return (RSLT_REDRAW);
 
 		/*
@@ -601,13 +596,20 @@ kbd_command(int ch)
 		 * Set interval
 		 */
 	case 'i':
-		if (prefix[0] != 0 || prefix[1] != 0) {
-			opt_interval.tv_sec = prefix[0];
-			opt_interval.tv_usec = prefix[1];
-			prefix[0] = 0, prefix[1] = 0;
-			ten_power = INVERSE_OF_MICRO;
-			prefix_decimal_flag = false;
-			decimal_point = false;
+		if (prefix >= 0) {
+			int i, power10;
+
+			for (power10 = 1, i = 0; i < decimal_point; i++)
+				power10 *= 10;
+
+			opt_interval.tv_sec = prefix / power10;
+			opt_interval.tv_usec = prefix % power10;
+			for (i = NUM_FRAQ_DIGITS_USEC; i < decimal_point; i++)
+				opt_interval.tv_usec /= 10;
+			for (i = decimal_point; i < NUM_FRAQ_DIGITS_USEC; i++)
+				opt_interval.tv_usec *= 10;
+
+			prefix = -1;
 		}
 		return (RSLT_REDRAW);
 
@@ -642,9 +644,9 @@ kbd_command(int ch)
 		start_line = MAX(start_line - (LINES - 2), 0);
 		break;
 	case 'g':
-		if (prefix[0] < MAXLINE)
-			start_line = prefix[0];
-		prefix[0] = 0;
+		if (prefix < MAXLINE)
+			start_line = prefix;
+		prefix = -1;
 		break;
 
 		/*
@@ -697,7 +699,7 @@ kbd_command(int ch)
 
 	}
 
-	prefix[0] = 0;
+	prefix = -1;
 	return (RSLT_REDRAW);
 }
 
