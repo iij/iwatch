@@ -122,8 +122,8 @@ main(int argc, char *argv[])
 
 	setlocale(LC_ALL, "");
 	/*
-         * Command line option handling
-         */
+	 * Command line option handling
+	 */
 	while ((ch = getopt(argc, argv, "+i:rewps:c:x")) != -1)
 		switch (ch) {
 		case 'i':
@@ -166,8 +166,8 @@ main(int argc, char *argv[])
 	argv += optind;
 
 	/*
-         * Build command string to give to popen
-         */
+	 * Build command string to give to popen
+	 */
 	if (argc <= 0) {
 		usage();
 		exit(EX_USAGE);
@@ -198,15 +198,15 @@ main(int argc, char *argv[])
 	cmdv[i++] = NULL;
 
 	/*
-         * Initialize signal
-         */
+	 * Initialize signal
+	 */
 	(void) signal(SIGINT, on_signal);
 	(void) signal(SIGTERM, on_signal);
 	(void) signal(SIGHUP, on_signal);
 
 	/*
-         * Initialize curses environment
-         */
+	 * Initialize curses environment
+	 */
 	initscr();
 	start_color();
 	use_default_colors();
@@ -215,8 +215,8 @@ main(int argc, char *argv[])
 	crmode();
 
 	/*
-         * Enter main processing loop and never come back here
-         */
+	 * Enter main processing loop and never come back here
+	 */
 	command_loop();
 
 	/* NOTREACHED */
@@ -309,7 +309,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 		printw("on every %d seconds", opt_interval[0]);
 	else {
 		digit = 6; tmp = opt_interval[1];
-		while(tmp % 10 == 0){
+		while (tmp % 10 == 0) {
 			digit--; tmp /= 10;
 		}
 		printw("on every %d.%0*d seconds", opt_interval[0],
@@ -508,7 +508,8 @@ read_result(BUFFER *buf)
 	close(fds[1]);
 
 	/* Read command output and convert tab to spaces * */
-	for (i = 0; i < MAXLINE && fgetws((*buf)[i], MAXCOLUMN, fp) != NULL; i++)
+	for (i = 0; i < MAXLINE && fgetws((*buf)[i], MAXCOLUMN, fp) != NULL;
+	    i++)
 		untabify((*buf)[i], sizeof((*buf)[i]));
 	fclose(fp);
 	do {
