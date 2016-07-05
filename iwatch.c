@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sysexits.h>
+#include <term.h>
 #include <time.h>
 #include <unistd.h>
 #include <wchar.h>
@@ -731,35 +732,35 @@ void
 showhelp(void)
 {
 	size_t length = 0;
-	int lines;
+	int nline;
 	int x, y;
 	int i;
 	const char *cp;
 	WINDOW *helpwin;
 	const char *cont_msg = " Hit any key to continue ";
 
-	for (lines = 0; (cp = helpmsg[lines]) != (char *) 0; lines++)
+	for (nline = 0; (cp = helpmsg[nline]) != (char *) 0; nline++)
 		if (strlen(cp) > length)
 			length = strlen(cp);
 
 	x = ((COLS - length - 2) + 1) / 2;
-	y = ((LINES - lines - 2) + 1) / 2;
+	y = ((LINES - nline - 2) + 1) / 2;
 
 	if (x < 0 || y < 0) {
 		fprintf(stderr, "\007");
 		return;
 	}
-	helpwin = newwin(lines + 2, length + 2, y, x);
+	helpwin = newwin(nline + 2, length + 2, y, x);
 
 	wclear(helpwin);
 	box(helpwin, '|', '-');
 
-	for (i = 0; i < lines; i++) {
+	for (i = 0; i < nline; i++) {
 		wmove(helpwin, i + 1, 1);
 		waddstr(helpwin, helpmsg[i]);
 	}
 
-	wmove(helpwin, lines + 1, length + 1 - strlen(cont_msg));
+	wmove(helpwin, nline + 1, length + 1 - strlen(cont_msg));
 	wstandout(helpwin);
 	waddstr(helpwin, cont_msg);
 	wstandend(helpwin);
@@ -831,7 +832,7 @@ void
 parse_style(void)
 {
 	int	i, code;
-	char	*p, *st, *st0, *token;
+	char	*p, *st, *st0, *token, tcapbuf[512], *bp = tcapbuf;
 	struct _codestrings {
 		int		 code;
 		int		 no;
@@ -880,5 +881,14 @@ parse_style(void)
 			}
 		}
 		free(st0);
+	} else if (getenv("CLICOLOR")) {
+		tgetent(tcapbuf, getenv("TERM"));
+		if (tgetstr("AF", &bp) && tgetstr("AB", &bp) &&
+		    (tgetstr("op", &bp) || tgetstr("oc", &bp))) {
+			style = A_DIM | A_REVERSE;
+			init_pair(1, COLOR_YELLOW, -1);
+			style &= ~A_COLOR;
+			style |= COLOR_PAIR(1);
+		}
 	}
 }
