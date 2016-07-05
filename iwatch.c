@@ -45,6 +45,8 @@
 #define MAX_COMMAND_LENGTH 128
 #define INVERSE_OF_MICRO 1000000
 
+#define NUM_FRAQ_DIGITS_USEC	6	/* number of fractal digits for usec */
+
 typedef enum {
 	REVERSE_NONE,
 	REVERSE_CHAR,
@@ -62,8 +64,7 @@ typedef enum {
 /*
  * Global symbols
  */
-int opt_interval[2] = { DEFAULT_INTERVAL, 0 }; /* interval
-						* { integral, decimal } */
+struct timeval	 opt_interval = { DEFAULT_INTERVAL, 0 };
 reverse_mode_t
 reverse_mode = REVERSE_NONE,		/* reverse mode */
 last_reverse_mode = REVERSE_CHAR;	/* remember previous reverse mode */
@@ -133,9 +134,9 @@ main(int argc, char *argv[])
 			if (*optarg == '-')
 				errx(EX_USAGE, "interval must be positive: %s",
 					optarg);
-			opt_interval[0] = (int)intvl;
-			opt_interval[1] = (int)(intvl * INVERSE_OF_MICRO) %
-				INVERSE_OF_MICRO;
+			opt_interval.tv_sec = (int)intvl;
+			opt_interval.tv_usec = (u_long)
+			    (intvl * INVERSE_OF_MICRO) % INVERSE_OF_MICRO;
 			break;
 		case 'r':
 			reverse_mode = REVERSE_CHAR;
@@ -250,8 +251,7 @@ redraw:
 		display(cur, prev, reverse_mode);
 
 input:
-		to.tv_sec = opt_interval[0];
-		to.tv_usec = opt_interval[1];
+		to = opt_interval;
 		FD_ZERO(&readfds);
 		FD_SET(fileno(stdin), &readfds);
 		nfds = select(1, &readfds, NULL, NULL,
@@ -291,7 +291,7 @@ input:
 int
 display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 {
-	int	 i, digit, tmp, screen_x, screen_y, cw, line, rl;
+	int	 i, num, val, screen_x, screen_y, cw, line, rl;
 	char	*ct;
 
 	erase();
@@ -303,17 +303,15 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 		printw("\"%s\" ", cmdstr);
 	if (pause_status)
 		printw("--PAUSE--");
-	else if (opt_interval[0] == 1 && opt_interval[1] == 0)
+	else if (opt_interval.tv_sec == 1 && opt_interval.tv_usec == 0)
 		printw("on every second");
-	else if (opt_interval[1] == 0)
-		printw("on every %d seconds", opt_interval[0]);
+	else if (opt_interval.tv_usec == 0)
+		printw("on every %d seconds", (int)opt_interval.tv_sec);
 	else {
-		digit = 6; tmp = opt_interval[1];
-		while (tmp % 10 == 0) {
-			digit--; tmp /= 10;
-		}
-		printw("on every %d.%0*d seconds", opt_interval[0],
-		    digit, tmp);
+		for (i = NUM_FRAQ_DIGITS_USEC, val = opt_interval.tv_usec;
+		    val % 10 == 0; val /= 10)
+			i--;
+		printw("on every %d.%*0d seconds", opt_interval.tv_sec, i, val);
 	}
 
 	ct = ctime(&lastupdate);
@@ -604,8 +602,8 @@ kbd_command(int ch)
 		 */
 	case 'i':
 		if (prefix[0] != 0 || prefix[1] != 0) {
-			opt_interval[0] = prefix[0];
-			opt_interval[1] = prefix[1];
+			opt_interval.tv_sec = prefix[0];
+			opt_interval.tv_usec = prefix[1];
 			prefix[0] = 0, prefix[1] = 0;
 			ten_power = INVERSE_OF_MICRO;
 			prefix_decimal_flag = false;
