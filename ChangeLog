@@ -1,3 +1,11 @@
+2016-09-01  YASUOKA Masahiko
+	* Update to 1.0.4
+2016-07-07  Ryuuichi Nagasaka
+	* Support decimal franction for the interval prefix
+	* Suport highlighting by changing color and attributes
+2015-09-07  YASUOK Masahiko
+	* Fix English from Preben Guldberg
+	* Improve manage from Preben Guldberg
 2015-01-20  YASUOKA Masahiko
 	* Use <sys/types.h> instead of <sys/params.h> not to refer
 	  unnessesary definitions.
