@@ -1,6 +1,6 @@
 2016-09-01  YASUOKA Masahiko
 	* Update to 1.0.4
-2016-07-07  Ryuuichi Nagasaka
+2016-07-07  Ryuichiro Nagasaka
 	* Support decimal franction for the interval prefix
 	* Suport highlighting by changing color and attributes
 2015-09-07  YASUOK Masahiko
