@@ -288,7 +288,7 @@ input:
 int
 display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 {
-	int	 i, num, val, screen_x, screen_y, cw, line, rl;
+	int	 i, val, screen_x, screen_y, cw, line, rl;
 	char	*ct;
 
 	erase();
