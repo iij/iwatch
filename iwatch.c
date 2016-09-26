@@ -91,6 +91,9 @@ typedef wchar_t BUFFER[MAXLINE][MAXCOLUMN + 1];
 #ifndef MIN
 #define MIN(x, y)	((x) < (y) ? (x) : (y))
 #endif
+#ifndef nitems
+#define nitems(_x)	(sizeof((_x)) / sizeof((_x)[0]))
+#endif
 
 #define ctrl(c)		((c) & 037)
 int main(int, char *[]);
@@ -831,13 +834,13 @@ usage(void)
 void
 parse_style(void)
 {
-	int	i, code;
+	int	i;
 	char	*p, *st, *st0, *token;
 	struct _codestrings {
 		int		 code;
 		int		 no;
 		const char	*string;
-	} codestrings[] = {
+	} colors[] = {
 		{ COLOR_BLACK,		0, "black"},
 		{ COLOR_RED,		0, "red" },
 		{ COLOR_GREEN,		0, "green" },
@@ -846,6 +849,7 @@ parse_style(void)
 		{ COLOR_MAGENTA,	0, "magenta" },
 		{ COLOR_CYAN,		0, "cyan" },
 		{ COLOR_WHITE,		0, "white" },
+	}, attrs[] = {
 		{ A_UNDERLINE,		0, "underline" },
 		{ A_REVERSE,		0, "reverse" },
 		{ A_DIM,		0, "dim" },
@@ -854,7 +858,6 @@ parse_style(void)
 		{ A_REVERSE,		1, "noreverse" },
 		{ A_DIM,		1, "nodim" },
 		{ A_BOLD,		1, "nobold" },
-		{ -1,			0, NULL }
 	};
 
 	if ((p = getenv("IWATCH_STYLE")) != NULL) {
@@ -863,22 +866,25 @@ parse_style(void)
 		while ((token = strsep(&st, " ,")) != NULL) {
 			if (*token == '\0')
 				continue;
-			for (i = 0; codestrings[i].code != -1; i++) {
-				if (strcasecmp(token, codestrings[i].string)
-				    != 0)
-					continue;
-				code = codestrings[i].code;
-				if ((NCURSES_BITS(code, 0) & A_COLOR) != 0) {
-					init_pair(1, code, -1);
+			for (i = 0; i < nitems(colors); i++) {
+				if (strcasecmp(token, colors[i].string) == 0) {
+					init_pair(1, colors[i].code, -1);
 					style &= ~A_COLOR;
 					style |= COLOR_PAIR(1);
-				} else if (code != -1) {
-					if (!codestrings[i].no)
-						style |= code;
-					else
-						style &= ~code;
+					goto next_token;
 				}
 			}
+			for (i = 0; i < nitems(attrs); i++) {
+				if (strcasecmp(token, attrs[i].string) == 0) {
+					if (attrs[i].no)
+						style &= ~attrs[i].code;
+					else
+						style |= attrs[i].code;
+					goto next_token;
+				}
+			}
+ next_token:
+			/* empty */;
 		}
 		free(st0);
 	}
