@@ -104,7 +104,7 @@ kbd_result_t kbd_command(int);
 void showhelp(void);
 void untabify(wchar_t *, int);
 void on_signal(int);
-void quit();
+void quit(void);
 void usage(void);
 void set_attr(void);
 void parse_style(void);
