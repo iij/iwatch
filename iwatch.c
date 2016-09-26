@@ -308,7 +308,8 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 		for (i = NUM_FRAQ_DIGITS_USEC, val = opt_interval.tv_usec;
 		    val % 10 == 0; val /= 10)
 			i--;
-		printw("on every %d.%*0d seconds", opt_interval.tv_sec, i, val);
+		printw("on every %d.%0*d seconds",
+		    (int)opt_interval.tv_sec, i, val);
 	}
 
 	ct = ctime(&lastupdate);
@@ -339,7 +340,7 @@ display(BUFFER * cur, BUFFER * prev, reverse_mode_t reverse)
 			for (i = 0, power10 = 1; i < decimal_point; i++)
 				power10 *= 10;
 
-			printw("%d.%*0d", prefix / power10, decimal_point,
+			printw("%d.%0*d", prefix / power10, decimal_point,
 			    prefix % power10);
 		} else if (decimal_point == 0)
 			printw("%d. ", prefix);
