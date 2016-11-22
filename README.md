@@ -7,7 +7,17 @@ and watch the output change.
 Installation
 ------------
 
-For *BSD
+    % git clone https://github.com/iij/iwatch
+    % cd iwatch
+    % ./configure
+    % gmake
+    % su
+    # gmake install
+
+Please remark to use "gmake" to use GNUmakefile.  Makefile is for
+OpenBSD.
+
+For OpenBSD
 
     % git clone https://github.com/iij/iwatch
     % cd iwatch
@@ -15,16 +25,8 @@ For *BSD
     % su
     # make BINDIR=/usr/local/bin MANDIR=/usr/local/man/man install
 
-For other systems
-
-    % git clone https://github.com/iij/iwatch
-    % cd iwatch
-    % ./configure
-    % make
-    % su
-    # make install
 
 How to use
 ----------
 
-    % iwatch -e netstat -sp ip
+    % iwatch -e netstat -s
